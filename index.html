@@ -396,6 +396,9 @@ td.c-flags .flag { display:flex; width:fit-content; max-width:100%; white-space:
 .fmt-prev-head { display:flex; justify-content:space-between; align-items:center; gap:10px; font-size:12.5px; color:var(--muted); margin-bottom:6px; }
 .fmt-prev .mail { box-shadow:none; }
 .fmt-tag { display:inline-block; margin-left:6px; padding:1px 7px; border-radius:999px; background:var(--bg); border:1px solid var(--border); font-size:10.5px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); vertical-align:1px; }
+.sent-pill { display:inline-flex; align-items:center; gap:5px; border:1px solid var(--border); background:#fff; border-radius:999px; padding:3px 10px; font:600 11.5px 'DM Sans',sans-serif; color:var(--purple); cursor:pointer; white-space:nowrap; }
+.sent-pill:hover { border-color:var(--purple); }
+.sent-pill.on { background:var(--ok); border-color:var(--ok); color:#fff; }
 .mail-head .mh-row { display:flex; align-items:baseline; gap:8px; }
 .mail-head .mh-row .lbl { flex:none; }
 .mail-head .mh-val { flex:1; min-width:0; overflow-wrap:anywhere; }
@@ -1157,7 +1160,7 @@ footer { background:var(--purple); color:rgba(255,255,255,.6); padding:48px 48px
   </div>
   <div class="footer-bottom">
     <span>© Nordicta 2026</span>
-    <span>Nordicta Sourcing · app 0.3.1</span>
+    <span>Nordicta Sourcing · app 0.4.0</span>
   </div>
 </footer>
 
@@ -1959,6 +1962,7 @@ const fmtD = (iso, loc, len) => new Intl.DateTimeFormat(loc, len === 'long' ? { 
 /* ---------- RFQ + counteroffer texts per language ---------- */
 const RFQ_I18N = {
   sv: { loc:'sv-SE', name:'svenska', greet:'Hej,', subj:(c,a,b) => 'Förfrågan om boende – '+c+' – '+a+' till '+b,
+    introShort:c => 'Nordicta söker just nu boende i '+c+' med omnejd för ett kommande uppdrag.',
     intro:c => 'Nordicta söker just nu boende i '+c+' med omnejd för ett längre uppdrag.', period:'Period', need:'Behov', months:n => n+(n === 1 ? ' månad' : ' månader'),
     single:(r,p) => r+' enkelrum för '+p+' personer – en person per sovrum. Lägenheter med flera sovrum går också bra.',
     multi:(r,p,k,tw) => r+' rum för '+p+' personer – '+k+' personer per rum'+(tw ? ', två separata sängar per rum' : ''),
@@ -1970,6 +1974,7 @@ const RFQ_I18N = {
     neg:{ thanks:(c,ref) => 'Tack för ert erbjudande för '+c+' (ref. '+ref+').', ask:(n,price,util) => 'Med tanke på perioden på '+n+' månader och antalet rum – kan ni se över priset och ge oss ert bästa långtidspris (B2B)? Vårt målpris är '+price+' per rum och månad'+(util ? ', inklusive el och värme' : '')+'.',
       notice:'Vi skulle också behöva en uppsägningstid på en månad.', tail:d => 'Vårt behov slutar '+d+'. Kan bindningstiden anpassas till det datumet?', wifi:'Bekräfta gärna också om wifi ingår.', bye:'Vänliga hälsningar' } },
   no: { loc:'nb-NO', name:'norska', greet:'Hei,', subj:(c,a,b) => 'Forespørsel om bolig – '+c+' – '+a+' til '+b,
+    introShort:c => 'Nordicta søker for tiden bolig i '+c+' og omegn til et kommende oppdrag.',
     intro:c => 'Nordicta søker for tiden bolig i '+c+' og omegn til et langvarig oppdrag.', period:'Periode', need:'Behov', months:n => n+(n === 1 ? ' måned' : ' måneder'),
     single:(r,p) => r+' enkeltrom til '+p+' personer – én person per soverom. Leiligheter med flere soverom passer også fint.',
     multi:(r,p,k,tw) => r+' rom til '+p+' personer – '+k+' personer per rom'+(tw ? ', to separate senger per rom' : ''),
@@ -1981,6 +1986,7 @@ const RFQ_I18N = {
     neg:{ thanks:(c,ref) => 'Takk for tilbudet deres for '+c+' (ref. '+ref+').', ask:(n,price,util) => 'Med tanke på perioden på '+n+' måneder og antall rom – kan dere se på prisen og gi oss deres beste langtidspris (B2B)? Målprisen vår er '+price+' per rom per måned'+(util ? ', inkludert strøm og oppvarming' : '')+'.',
       notice:'Vi trenger også en oppsigelsestid på én måned.', tail:d => 'Behovet vårt slutter '+d+'. Kan bindingstiden tilpasses denne datoen?', wifi:'Bekreft gjerne også om Wi-Fi er inkludert.', bye:'Vennlig hilsen' } },
   da: { loc:'da-DK', name:'danska', greet:'Hej,', subj:(c,a,b) => 'Forespørgsel om bolig – '+c+' – '+a+' til '+b,
+    introShort:c => 'Nordicta søger i øjeblikket bolig i '+c+' og omegn til en kommende opgave.',
     intro:c => 'Nordicta søger i øjeblikket bolig i '+c+' og omegn til et længerevarende behov.', period:'Periode', need:'Behov', months:n => n+(n === 1 ? ' måned' : ' måneder'),
     single:(r,p) => r+' enkeltværelser til '+p+' personer – én person pr. soveværelse. Lejligheder med flere soveværelser er også velkomne.',
     multi:(r,p,k,tw) => r+' værelser til '+p+' personer – '+k+' personer pr. værelse'+(tw ? ', to separate senge pr. værelse' : ''),
@@ -1992,6 +1998,7 @@ const RFQ_I18N = {
     neg:{ thanks:(c,ref) => 'Tak for jeres tilbud for '+c+' (ref. '+ref+').', ask:(n,price,util) => 'Med tanke på perioden på '+n+' måneder og antallet af værelser – kan I se på prisen og give os jeres bedste langtidspris (B2B)? Vores målpris er '+price+' pr. værelse pr. måned'+(util ? ', inkl. el og varme' : '')+'.',
       notice:'Vi har også brug for et opsigelsesvarsel på én måned.', tail:d => 'Vores behov slutter den '+d+'. Kan bindingsperioden tilpasses denne dato?', wifi:'Bekræft gerne også, om Wi-Fi er inkluderet.', bye:'Venlig hilsen' } },
   fi: { loc:'fi-FI', name:'finska', greet:'Hei,', subj:(c,a,b) => 'Majoitustiedustelu – '+c+' – '+a+'–'+b,
+    introShort:c => 'Nordicta etsii parhaillaan majoitusta tulevaa tarvetta varten. Alue: '+c+' ja lähiympäristö.',
     intro:c => 'Nordicta etsii parhaillaan majoitusta pitkäaikaiseen tarpeeseen. Alue: '+c+' ja lähiympäristö.', period:'Ajanjakso', need:'Tarve', months:n => n+(n === 1 ? ' kuukausi' : ' kuukautta'),
     single:(r,p) => r+' yhden hengen huonetta '+p+' henkilölle – yksi henkilö makuuhuonetta kohden. Myös useamman makuuhuoneen asunnot sopivat.',
     multi:(r,p,k,tw) => r+' huonetta '+p+' henkilölle – '+k+' henkilöä huonetta kohden'+(tw ? ', kaksi erillistä sänkyä huoneessa' : ''),
@@ -2003,6 +2010,7 @@ const RFQ_I18N = {
     neg:{ thanks:(c,ref) => 'Kiitos tarjouksestanne ('+c+', viite '+ref+').', ask:(n,price,util) => 'Ottaen huomioon '+n+' kuukauden ajanjakson ja huoneiden määrän: voisitteko tarkistaa hintaa ja antaa parhaan pitkäaikaisen B2B-hintanne? Tavoitehintamme on '+price+' huonetta kohden kuukaudessa'+(util ? ', sähkö ja lämmitys mukaan lukien' : '')+'.',
       notice:'Tarvitsisimme myös yhden kuukauden irtisanomisajan.', tail:d => 'Tarpeemme päättyy '+d+'. Voisiko vähimmäisvuokra-ajan sovittaa tähän päivämäärään?', wifi:'Vahvistaisitteko myös, sisältyykö Wi-Fi hintaan.', bye:'Ystävällisin terveisin' } },
   de: { loc:'de-DE', name:'tyska', greet:'Sehr geehrte Damen und Herren,', subj:(c,a,b) => 'Unterkunftsanfrage – '+c+' – '+a+' bis '+b,
+    introShort:c => 'Nordicta sucht derzeit Unterkünfte in '+c+' und Umgebung für einen bevorstehenden Bedarf.',
     intro:c => 'Nordicta sucht derzeit Unterkünfte in '+c+' und Umgebung für einen langfristigen Bedarf.', period:'Zeitraum', need:'Bedarf', months:n => n+(n === 1 ? ' Monat' : ' Monate'),
     single:(r,p) => r+' Einzelzimmer für '+p+' Personen – eine Person pro Schlafzimmer. Wohnungen mit mehreren Schlafzimmern sind willkommen.',
     multi:(r,p,k,tw) => r+' Zimmer für '+p+' Personen – '+k+' Personen pro Zimmer'+(tw ? ', zwei getrennte Betten pro Zimmer' : ''),
@@ -2014,8 +2022,9 @@ const RFQ_I18N = {
     neg:{ thanks:(c,ref) => 'vielen Dank für Ihr Angebot für '+c+' (Ref. '+ref+').', ask:(n,price,util) => 'Angesichts des Zeitraums von '+n+' Monaten und der Anzahl der Zimmer: Könnten Sie Ihren Preis noch einmal prüfen und uns Ihren besten Langzeitpreis (B2B) nennen? Unser Zielpreis liegt bei '+price+' pro Zimmer und Monat'+(util ? ', inklusive Nebenkosten' : '')+'.',
       notice:'Wir benötigen außerdem eine Kündigungsfrist von einem Monat.', tail:d => 'Unser Bedarf endet am '+d+'. Könnte die Mindestlaufzeit an dieses Datum angepasst werden?', wifi:'Bitte bestätigen Sie auch, ob WLAN inklusive ist.', bye:'Mit freundlichen Grüßen' } },
   en: { loc:'en-GB', name:'engelska', greet:'Hello,', subj:(c,a,b) => 'Housing Requirement – '+c+' – '+a+' to '+b,
+    introShort:c => 'Nordicta is currently sourcing accommodation in '+c+' and the surrounding area for an upcoming requirement.',
     intro:c => 'Nordicta is currently sourcing accommodation in '+c+' and the surrounding area for a long-term requirement.', period:'Period', need:'Requirement', months:n => n+(n === 1 ? ' month' : ' months'),
-    single:(r,p) => r+' single rooms for '+p+' persons – one person per bedroom. Apartments with several bedrooms are welcome.',
+    single:(r,p) => r+' single bedrooms for '+p+' persons – one person per bedroom. Apartments with several bedrooms are welcome.',
     multi:(r,p,k,tw) => r+' rooms for '+p+' persons – '+k+' persons per room'+(tw ? ', two separate beds per room' : ''),
     furn:['Furnished','Furnished preferred'], kitchen:['Kitchen required','Kitchen access preferred'], wifi:['Wi-Fi required','Wi-Fi preferred'], parking:n => 'Parking for '+n+(n === 1 ? ' car' : ' cars'), invoice:'Corporate invoicing',
     ask:'Please let us know how many rooms are available for the full period, your best monthly B2B rate and what is included (utilities, Wi-Fi, cleaning), as well as parking, deposit and notice terms.',
@@ -2025,6 +2034,7 @@ const RFQ_I18N = {
     neg:{ thanks:(c,ref) => 'Thank you for your offer for '+c+' (ref '+ref+').', ask:(n,price,util) => 'Considering the '+n+'-month period and the number of rooms, could you review the rate and share your best long-stay B2B price? Our target is '+price+' per room per month'+(util ? ', including utilities' : '')+'.',
       notice:'We would also need a notice period of one month.', tail:d => 'Our requirement ends on '+d+'. Could the minimum commitment be aligned with that date?', wifi:'Please also confirm whether Wi-Fi can be included.', bye:'Kind regards,' } },
   nl: { loc:'nl-NL', name:'nederländska', greet:'Geachte heer/mevrouw,', subj:(c,a,b) => 'Aanvraag huisvesting – '+c+' – '+a+' t/m '+b,
+    introShort:c => 'Nordicta zoekt momenteel huisvesting in '+c+' en omgeving voor een aankomende behoefte.',
     intro:c => 'Nordicta zoekt momenteel huisvesting in '+c+' en omgeving voor een langdurige behoefte.', period:'Periode', need:'Behoefte', months:n => n+(n === 1 ? ' maand' : ' maanden'),
     single:(r,p) => r+' eenpersoonskamers voor '+p+' personen – één persoon per slaapkamer. Appartementen met meerdere slaapkamers zijn ook welkom.',
     multi:(r,p,k,tw) => r+' kamers voor '+p+' personen – '+k+' personen per kamer'+(tw ? ', twee aparte bedden per kamer' : ''),
@@ -2036,6 +2046,7 @@ const RFQ_I18N = {
     neg:{ thanks:(c,ref) => 'Hartelijk dank voor uw aanbod voor '+c+' (ref. '+ref+').', ask:(n,price,util) => 'Gezien de periode van '+n+' maanden en het aantal kamers: kunt u de prijs nog eens bekijken en ons uw beste langetermijnprijs (B2B) geven? Onze richtprijs is '+price+' per kamer per maand'+(util ? ', inclusief energie' : '')+'.',
       notice:'Wij zouden ook graag een opzegtermijn van één maand hebben.', tail:d => 'Onze behoefte eindigt op '+d+'. Kan de minimale huurperiode op die datum worden afgestemd?', wifi:'Kunt u ook bevestigen of wifi inbegrepen is?', bye:'Met vriendelijke groet,' } },
   fr: { loc:'fr-FR', name:'franska', greet:'Madame, Monsieur,', subj:(c,a,b) => 'Demande d’hébergement – '+c+' – du '+a+' au '+b,
+    introShort:c => 'Nordicta recherche actuellement un hébergement à '+c+' et dans ses environs pour un besoin à venir.',
     intro:c => 'Nordicta recherche actuellement un hébergement à '+c+' et dans ses environs pour un besoin de longue durée.', period:'Période', need:'Besoin', months:n => n+' mois',
     single:(r,p) => r+' chambres individuelles pour '+p+' personnes – une personne par chambre. Les appartements avec plusieurs chambres conviennent également.',
     multi:(r,p,k,tw) => r+' chambres pour '+p+' personnes – '+k+' personnes par chambre'+(tw ? ', deux lits séparés par chambre' : ''),
@@ -2047,6 +2058,7 @@ const RFQ_I18N = {
     neg:{ thanks:(c,ref) => 'Merci pour votre offre pour '+c+' (réf. '+ref+').', ask:(n,price,util) => 'Compte tenu de la durée de '+n+' mois et du nombre de chambres, pourriez-vous revoir votre tarif et nous proposer votre meilleur prix longue durée (B2B) ? Notre prix cible est de '+price+' par chambre et par mois'+(util ? ', charges comprises' : '')+'.',
       notice:'Nous aurions également besoin d’un préavis d’un mois.', tail:d => 'Notre besoin prend fin le '+d+'. La durée minimale d’engagement pourrait-elle être alignée sur cette date ?', wifi:'Pourriez-vous également confirmer si le Wi-Fi est inclus ?', bye:'Bien cordialement,' } },
   es: { loc:'es-ES', name:'spanska', greet:'Estimados señores:', subj:(c,a,b) => 'Solicitud de alojamiento – '+c+' – del '+a+' al '+b,
+    introShort:c => 'Nordicta está buscando alojamiento en '+c+' y alrededores para una próxima necesidad.',
     intro:c => 'Nordicta está buscando alojamiento en '+c+' y alrededores para una necesidad de larga duración.', period:'Período', need:'Necesidad', months:n => n+(n === 1 ? ' mes' : ' meses'),
     single:(r,p) => r+' habitaciones individuales para '+p+' personas – una persona por dormitorio. También aceptamos apartamentos con varios dormitorios.',
     multi:(r,p,k,tw) => r+' habitaciones para '+p+' personas – '+k+' personas por habitación'+(tw ? ', dos camas separadas por habitación' : ''),
@@ -2058,6 +2070,7 @@ const RFQ_I18N = {
     neg:{ thanks:(c,ref) => 'Gracias por su oferta para '+c+' (ref. '+ref+').', ask:(n,price,util) => 'Teniendo en cuenta el período de '+n+' meses y el número de habitaciones, ¿podrían revisar el precio y ofrecernos su mejor tarifa de larga estancia (B2B)? Nuestro precio objetivo es de '+price+' por habitación y mes'+(util ? ', suministros incluidos' : '')+'.',
       notice:'También necesitaríamos un plazo de preaviso de un mes.', tail:d => 'Nuestra necesidad termina el '+d+'. ¿Podría ajustarse la permanencia mínima a esa fecha?', wifi:'¿Podrían confirmar también si el Wi-Fi está incluido?', bye:'Un cordial saludo,' } },
   pt: { loc:'pt-PT', name:'portugisiska', greet:'Exmos. Senhores,', subj:(c,a,b) => 'Pedido de alojamento – '+c+' – '+a+' a '+b,
+    introShort:c => 'A Nordicta procura alojamento em '+c+' e arredores para uma necessidade próxima.',
     intro:c => 'A Nordicta procura alojamento em '+c+' e arredores para uma necessidade de longa duração.', period:'Período', need:'Necessidade', months:n => n+(n === 1 ? ' mês' : ' meses'),
     single:(r,p) => r+' quartos individuais para '+p+' pessoas – uma pessoa por quarto. Apartamentos com vários quartos também são bem-vindos.',
     multi:(r,p,k,tw) => r+' quartos para '+p+' pessoas – '+k+' pessoas por quarto'+(tw ? ', duas camas separadas por quarto' : ''),
@@ -2069,6 +2082,7 @@ const RFQ_I18N = {
     neg:{ thanks:(c,ref) => 'Obrigado pela vossa proposta para '+c+' (ref. '+ref+').', ask:(n,price,util) => 'Tendo em conta o período de '+n+' meses e o número de quartos, poderiam rever o preço e indicar-nos o vosso melhor preço para estadias longas (B2B)? O nosso preço-alvo é de '+price+' por quarto e por mês'+(util ? ', com despesas incluídas' : '')+'.',
       notice:'Precisaríamos também de um prazo de pré-aviso de um mês.', tail:d => 'A nossa necessidade termina a '+d+'. Seria possível ajustar o período mínimo de arrendamento a essa data?', wifi:'Poderiam também confirmar se o Wi-Fi está incluído?', bye:'Com os melhores cumprimentos,' } },
   it: { loc:'it-IT', name:'italienska', greet:'Gentili Signori,', subj:(c,a,b) => 'Richiesta di alloggio – '+c+' – dal '+a+' al '+b,
+    introShort:c => 'Nordicta sta cercando alloggi a '+c+' e dintorni per un’esigenza imminente.',
     intro:c => 'Nordicta sta cercando alloggi a '+c+' e dintorni per un’esigenza di lunga durata.', period:'Periodo', need:'Esigenza', months:n => n+(n === 1 ? ' mese' : ' mesi'),
     single:(r,p) => r+' camere singole per '+p+' persone – una persona per camera. Vanno bene anche appartamenti con più camere.',
     multi:(r,p,k,tw) => r+' camere per '+p+' persone – '+k+' persone per camera'+(tw ? ', due letti separati per camera' : ''),
@@ -2080,6 +2094,7 @@ const RFQ_I18N = {
     neg:{ thanks:(c,ref) => 'Grazie per la vostra offerta per '+c+' (rif. '+ref+').', ask:(n,price,util) => 'Considerato il periodo di '+n+' mesi e il numero di camere, potreste rivedere la tariffa e indicarci il vostro miglior prezzo per soggiorni lunghi (B2B)? Il nostro prezzo obiettivo è '+price+' per camera al mese'+(util ? ', utenze incluse' : '')+'.',
       notice:'Avremmo inoltre bisogno di un preavviso di un mese.', tail:d => 'La nostra esigenza termina il '+d+'. È possibile allineare la durata minima a questa data?', wifi:'Potreste anche confermare se il Wi-Fi è incluso?', bye:'Cordiali saluti,' } },
   pl: { loc:'pl-PL', name:'polska', greet:'Szanowni Państwo,', subj:(c,a,b) => 'Zapytanie o zakwaterowanie – '+c+' – '+a+'–'+b,
+    introShort:c => 'Nordicta poszukuje obecnie zakwaterowania. Lokalizacja: '+c+' i okolice.',
     intro:c => 'Nordicta poszukuje obecnie zakwaterowania na dłuższy okres. Lokalizacja: '+c+' i okolice.', period:'Okres', need:'Zapotrzebowanie', months:n => n+' mies.',
     single:(r,p) => 'Liczba pokoi jednoosobowych: '+r+', liczba osób: '+p+' – jedna osoba na sypialnię. Mile widziane są także mieszkania z kilkoma sypialniami.',
     multi:(r,p,k,tw) => 'Liczba pokoi: '+r+', liczba osób: '+p+' – '+k+' os. na pokój'+(tw ? ', dwa oddzielne łóżka w pokoju' : ''),
@@ -2091,6 +2106,7 @@ const RFQ_I18N = {
     neg:{ thanks:(c,ref) => 'Dziękujemy za ofertę (lokalizacja: '+c+', nr ref. '+ref+').', ask:(n,price,util) => 'Biorąc pod uwagę okres '+n+' mies. i liczbę pokoi, czy mogliby Państwo zweryfikować cenę i przedstawić najlepszą cenę długoterminową (B2B)? Nasza cena docelowa to '+price+' za pokój miesięcznie'+(util ? ', łącznie z mediami' : '')+'.',
       notice:'Potrzebowalibyśmy również jednomiesięcznego okresu wypowiedzenia.', tail:d => 'Nasze zapotrzebowanie kończy się '+d+'. Czy minimalny okres najmu można dopasować do tej daty?', wifi:'Prosimy również o potwierdzenie, czy Wi-Fi jest wliczone w cenę.', bye:'Z poważaniem' } },
   sk: { loc:'sk-SK', name:'slovakiska', greet:'Dobrý deň,', subj:(c,a,b) => 'Dopyt na ubytovanie – '+c+' – '+a+' – '+b,
+    introShort:c => 'Nordicta momentálne hľadá ubytovanie. Lokalita: '+c+' a okolie.',
     intro:c => 'Nordicta momentálne hľadá dlhodobé ubytovanie. Lokalita: '+c+' a okolie.', period:'Obdobie', need:'Požiadavka', months:n => n+' mes.',
     single:(r,p) => 'Počet jednolôžkových izieb: '+r+', počet osôb: '+p+' – jedna osoba na spálňu. Vítané sú aj byty s viacerými spálňami.',
     multi:(r,p,k,tw) => 'Počet izieb: '+r+', počet osôb: '+p+' – '+k+' osoby na izbu'+(tw ? ', dve samostatné postele v izbe' : ''),
@@ -2206,16 +2222,49 @@ function makeDrafts(){
   saveRfqs();
   go(4);
 }
-function rfqSubject(sp){ const r = req(), L = RFQ_I18N[rfqLang(sp)]; return L.subj(r.city, fmtD(r.start, L.loc), fmtD(r.end, L.loc))+' ['+S.rfq[sp.id].ref+']'; }
-// The mail exactly as it is copied: plain text, no signature (Outlook adds the person's own), ends with the closing line.
-function rfqPlain(sp){
-  const r = req(), q = S.rfq[sp.id], code = rfqLang(sp), L = RFQ_I18N[code];
+// Subject without our reference number (not used for now).
+function rfqSubject(sp){ const r = req(), L = RFQ_I18N[rfqLang(sp)]; return L.subj(r.city, fmtD(r.start, L.loc), fmtD(r.end, L.loc)); }
+// The RFQ in one language. "Long-term" only when the period is 3 months or more.
+function rfqBlock(sp, code){
+  const r = req(), L = RFQ_I18N[code];
   const needs = rfqNeeds(r, L), rooms = r.ppr === 1 ? L.single(r.rooms, r.persons) : L.multi(r.rooms, r.persons, r.ppr, r.twin === 'Krävs');
-  return [rfqGreeting(sp, code), '', L.intro(r.city), '',
-      L.period+': '+fmtD(r.start, L.loc, 'long')+' – '+fmtD(r.end, L.loc, 'long')+' ('+L.months(Math.round(r.months))+')',
-      L.need+': '+rooms]
-    .concat(needs.length ? [''].concat(needs.map(n => '• '+n)) : [])
-    .concat(['', L.ask, '', L.reply(q.ref), '', L.privacy(r.city), '', L.thanks]).join('\n');
+  return { greet:rfqGreeting(sp, code), intro:(r.months < 3 && L.introShort ? L.introShort : L.intro)(r.city),
+    period:[L.period, fmtD(r.start, L.loc, 'long')+' – '+fmtD(r.end, L.loc, 'long')+' ('+L.months(Math.round(r.months))+')'],
+    need:[L.need, rooms], needs, ask:L.ask, privacy:L.privacy(r.city), thanks:L.thanks };
+}
+// The supplier's language first, the same text in English below it (not for English or Swedish suppliers).
+// No signature: Outlook adds the person's own under the closing line.
+const EN_SEP = '— English version —';
+function rfqCodes(sp){ const c = rfqLang(sp); return c === 'en' || c === 'sv' ? [c] : [c, 'en']; }
+function rfqMail(sp){
+  const blocks = rfqCodes(sp).map(c => rfqBlock(sp, c));
+  const text = blocks.map(b => [b.greet, '', b.intro, '', b.period[0]+': '+b.period[1], b.need[0]+': '+b.need[1]]
+      .concat(b.needs.length ? [''].concat(b.needs.map(n => '• '+n)) : []).concat(['', b.ask, '', b.privacy, '', b.thanks]).join('\n'))
+    .join('\n\n'+EN_SEP+'\n\n');
+  const P = 'margin:0 0 11pt 0';
+  const html = '<div style="font-family:Aptos,Calibri,Arial,sans-serif;font-size:11pt;color:#000000">'+blocks.map(b =>
+      '<p style="'+P+'">'+esc(b.greet)+'</p><p style="'+P+'">'+esc(b.intro)+'</p>'+
+      '<p style="'+P+'"><b>'+esc(b.period[0])+':</b> '+esc(b.period[1])+'<br><b>'+esc(b.need[0])+':</b> '+esc(b.need[1])+'</p>'+
+      (b.needs.length ? '<ul style="margin:0 0 11pt 0;padding-left:18pt">'+b.needs.map(n => '<li>'+esc(n)+'</li>').join('')+'</ul>' : '')+
+      '<p style="'+P+'">'+esc(b.ask)+'</p>'+
+      '<p style="margin:0 0 11pt 0;font-size:8pt;color:#808080">'+esc(b.privacy)+'</p>'+
+      '<p style="'+P+'">'+esc(b.thanks)+'</p>'
+    ).join('<p style="margin:16pt 0 11pt 0;font-size:9pt;color:#808080">'+EN_SEP+'</p>')+'</div>';
+  return { text, html };
+}
+function rfqPlain(sp){ return rfqMail(sp).text; }
+// Copies formatted text (Outlook keeps the small privacy note) with plain text as fallback.
+async function copyRich(html, text){
+  try {
+    if (window.ClipboardItem && navigator.clipboard && navigator.clipboard.write) {
+      await navigator.clipboard.write([new ClipboardItem({ 'text/html':new Blob([html], { type:'text/html' }), 'text/plain':new Blob([text], { type:'text/plain' }) })]);
+      return true;
+    }
+  } catch (e) {}
+  let ok = false;
+  const on = e => { e.clipboardData.setData('text/html', html); e.clipboardData.setData('text/plain', text); e.preventDefault(); ok = true; };
+  document.addEventListener('copy', on); try { document.execCommand('copy'); } catch (e) {} document.removeEventListener('copy', on);
+  return ok;
 }
 const IC_COPY = '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>';
 async function copyText(t){
@@ -2241,9 +2290,9 @@ function renderRfq(){
     '<div class="mail-head">'+
       '<div class="mh-row"><span class="lbl">Till</span><span class="mh-val">'+(sp.email ? esc(sp.email) : '<span class="muted">Ingen e-post: '+esc(sp.manual || 'kontakta via webbplats eller telefon')+'</span>')+'</span>'+(sp.email ? '<button type="button" class="copy-mini" data-copy="to">Kopiera</button>' : '')+'</div>'+
       '<div class="mh-row"><span class="lbl">Ämne</span><span class="mh-val"><b>'+esc(rfqSubject(sp))+'</b></span><button type="button" class="copy-mini" data-copy="subject">Kopiera</button></div>'+
-      '<div class="mh-row"><span class="lbl">Språk</span><span class="mh-val">'+esc(L.name)+'</span></div>'+
+      '<div class="mh-row"><span class="lbl">Språk</span><span class="mh-val">'+esc(rfqCodes(sp).map(c => RFQ_I18N[c].name).join(' + '))+'</span></div>'+
     '</div>'+
-    '<div class="mail-body plain"><div class="mail-reply">'+esc(rfqPlain(sp))+'</div></div>'+
+    '<div class="mail-body plain rfq-html">'+rfqMail(sp).html+'</div>'+
     '<div class="rfq-actions">'+
       '<button type="button" class="btn" data-copy="body">'+IC_COPY+'<span>Kopiera mejltext</span></button>'+
       (q.sentMark ? '<span class="sent-done">'+IC.check+'Skickad '+esc(q.sentMark.at)+'</span><button type="button" class="linkbtn" data-mark="0">Ångra</button>'
@@ -2269,8 +2318,8 @@ $('#mailView').addEventListener('click', async e => {
   const sp = byId(S.rfqView), q = S.rfq[S.rfqView];
   if (!sp || !q) return;
   if (c) {
-    const what = c.dataset.copy, t = what === 'to' ? sp.email : what === 'subject' ? rfqSubject(sp) : rfqPlain(sp);
-    const ok = await copyText(t);
+    const what = c.dataset.copy, mail = what === 'body' ? rfqMail(sp) : null;
+    const ok = mail ? await copyRich(mail.html, mail.text) : await copyText(what === 'to' ? sp.email : rfqSubject(sp));
     toast(!ok ? 'Kunde inte kopiera. Markera texten och kopiera med Ctrl+C.' : what === 'body' ? 'Mejltexten är kopierad. Klistra in den ovanför din signatur i Outlook.' : what === 'to' ? 'Mottagaren är kopierad' : 'Ämnesraden är kopierad');
     if (ok && what === 'body') { const lbl = c.querySelector('span'); lbl.textContent = 'Kopierat ✓'; setTimeout(() => { if (lbl.isConnected) lbl.textContent = 'Kopiera mejltext'; }, 2200); }
     return;
@@ -3872,6 +3921,23 @@ function logTo(st, who, txt){
 // Lines written while a request is open are also saved (see REMOTE.logLine).
 { const _log = log; log = function (who, txt, mins){ _log(who, txt, mins); if (CUR && DATASETS[CUR] && DATASETS[CUR].semi) REMOTE.logLine(CUR, who, txt); }; }
 { const _logTo = logTo; logTo = function (st, who, txt){ _logTo(st, who, txt); const id = Object.keys(STATES).find(k => STATES[k] === st); if (id && DATASETS[id] && DATASETS[id].semi) REMOTE.logLine(id, who, txt); }; }
+// "Markera skickad" in the supplier list: creates the RFQ text if needed and ticks it (or takes the tick back)
+{ const _contactCell = contactCell; contactCell = sp => _contactCell(sp) + sentToggle(sp); }
+function sentToggle(sp){
+  if (S.excluded.has(sp.id)) return '';
+  const q = S.rfq[sp.id], on = !!(q && q.sentMark);
+  return '<div style="margin-top:6px"><button type="button" class="sent-pill'+(on ? ' on' : '')+'" data-sent="'+sp.id+'" aria-pressed="'+on+'" title="'+(on ? 'Klicka för att ångra' : 'Bocka av när mejlet är skickat från Outlook')+'">'+(on ? IC.check+'Skickad' : 'Markera skickad')+'</button></div>';
+}
+function toggleSent(id){
+  if (!canSend()) { toast(sendBlockMsg()); return; }
+  const sp = byId(id); if (!sp) return;
+  if (!S.rfq[id]) { S.rfq[id] = textDraft(sp); S.sent = true; if (!S.rfqView) S.rfqView = id; }
+  const q = S.rfq[id];
+  if (q.sentMark) { q.sentMark = null; q.status = 'Att skicka'; q.cls = 'open'; log('pm','Ångrade markeringen för '+sp.name); }
+  else { q.sentMark = { at:new Date().toLocaleString('sv-SE', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' }), by:me().name }; q.status = 'Skickad'; q.cls = 'ok'; log('pm','Markerade '+sp.name+' som skickad (mejlet skickat från egen Outlook)'); }
+  saveRfqs(); lockRequest(); renderResults(); renderReqBar(); renderStepper();
+}
+$('#resTable').addEventListener('click', e => { const b = e.target.closest('[data-sent]'); if (b) toggleSent(+b.dataset.sent); });
 let AUTOSAVE_T = null, CHOICES_T = null;
 function scheduleAutosave(){
   if (!(DS && DS.semi && CUR)) return;
