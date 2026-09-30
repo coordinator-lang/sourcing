@@ -1157,7 +1157,7 @@ footer { background:var(--purple); color:rgba(255,255,255,.6); padding:48px 48px
   </div>
   <div class="footer-bottom">
     <span>© Nordicta 2026</span>
-    <span>Nordicta Sourcing · app 0.3.0</span>
+    <span>Nordicta Sourcing · app 0.3.1</span>
   </div>
 </footer>
 
@@ -3633,6 +3633,7 @@ function leaveRequest(){
   PARSE_SEQ++; S.parseBusy = false;
   S.fields = {}; FIELD_IDS.forEach(k => { S.fields[k] = document.getElementById(k).value; });
   S.reqText = $('#reqText').value;
+  flushAutosave();
   closeModal(); closeDrawer();
   CUR = null;
 }
@@ -3645,6 +3646,7 @@ function openRequest(id){
   S = STATES[id] || (STATES[id] = seedState(q, DS));
   S._portalOpened = false; S._portalFor = null;
   restoreRfqs(id);
+  restoreChoices(id);
   FIELD_IDS.forEach(k => { document.getElementById(k).value = S.fields ? (S.fields[k] || '') : ''; });
   $('#reqText').value = S.reqText != null ? S.reqText : REQ_TEXT;
   $('#btnParse').querySelector('span').textContent = S.parsed ? 'Tolka igen' : 'Tolka med AI';
@@ -3870,6 +3872,30 @@ function logTo(st, who, txt){
 // Lines written while a request is open are also saved (see REMOTE.logLine).
 { const _log = log; log = function (who, txt, mins){ _log(who, txt, mins); if (CUR && DATASETS[CUR] && DATASETS[CUR].semi) REMOTE.logLine(CUR, who, txt); }; }
 { const _logTo = logTo; logTo = function (st, who, txt){ _logTo(st, who, txt); const id = Object.keys(STATES).find(k => STATES[k] === st); if (id && DATASETS[id] && DATASETS[id].semi) REMOTE.logLine(id, who, txt); }; }
+let AUTOSAVE_T = null, CHOICES_T = null;
+function scheduleAutosave(){
+  if (!(DS && DS.semi && CUR)) return;
+  clearTimeout(AUTOSAVE_T); AUTOSAVE_T = setTimeout(() => { AUTOSAVE_T = null; if (DS && DS.semi && CUR) semiSaveRequest(!!(S && S.saved)); }, 1200);
+}
+function flushAutosave(){ if (AUTOSAVE_T && DS && DS.semi && CUR) { clearTimeout(AUTOSAVE_T); AUTOSAVE_T = null; semiSaveRequest(!!(S && S.saved)); } }
+$('#structFields').addEventListener('input', scheduleAutosave);
+$('#structFields').addEventListener('change', scheduleAutosave);
+$('#reqText').addEventListener('input', scheduleAutosave);
+window.addEventListener('beforeunload', flushAutosave);
+function restoreChoices(id){
+  const ds = DATASETS[id], c = ds && ds.semi && ds.rec && ds.rec.ui && ds.rec.ui.choices;
+  if (!c || !S.sourced) return;
+  S.sel = new Set(c.sel || []); S.excluded = new Set(c.excluded || []); S.classOverride = Object.assign({}, c.classOverride || {});
+}
+function saveChoices(){
+  if (!(DS && DS.semi && CUR && S && S.sourced)) return;
+  const ds = DATASETS[CUR], ui = ds.rec.ui || {};
+  const c = { sel:[...S.sel].sort((a, b) => a - b), excluded:[...S.excluded].sort((a, b) => a - b), classOverride:S.classOverride };
+  if (JSON.stringify(ui.choices || null) === JSON.stringify(c)) return;
+  ds.rec.ui = Object.assign({}, ui, { choices:c });
+  const id = CUR; clearTimeout(CHOICES_T); CHOICES_T = setTimeout(() => REMOTE.saveUi(id, DATASETS[id].rec.ui), 800);
+}
+{ const _renderResults = renderResults; renderResults = function (){ _renderResults(); saveChoices(); }; }
 const SEMI_TILE = (k, v, sub) => '<div class="stat"><div class="k">'+k+'</div><div class="v">'+v+'</div><div class="s">'+sub+'</div></div>';
 function semiDataset(rec){
   const R = rec.result, f = rec.fields || {};
@@ -3955,6 +3981,7 @@ async function semiParse(){
       Object.entries(out.fields).forEach(([k, v]) => { const el = document.getElementById(k); if (!el || v === '' || v == null) return; el.value = v; const f = el.closest('.field'); if (f) { f.classList.remove('flash'); void f.offsetWidth; f.classList.add('flash'); } });
       b.querySelector('span').textContent = 'Tolka igen'; renderCalc(); lockRequest();
       st.fields = {}; FIELD_IDS.forEach(k => { st.fields[k] = document.getElementById(k).value; });
+      scheduleAutosave();
     } else {
       st.fields = Object.assign({}, st.fields || {}, Object.fromEntries(Object.entries(out.fields).filter(([, v]) => v !== '')));
     }
@@ -3986,7 +4013,7 @@ async function semiSourceConfirm(){
 }
 async function semiStartRun(){
   const id = CUR, st = S;
-  if (!st.saved) saveReq(true);
+  if (!st.saved) saveReq(true); else semiSaveRequest(true);
   const fields = {}; FIELD_IDS.forEach(k => { fields[k] = document.getElementById(k).value; }); st.fields = fields;
   try { await api('/api/runs/'+id, { method:'POST', body:{ fields } }); }
   catch (e) { toast('Sökningen kunde inte startas: '+e.message); return; }
