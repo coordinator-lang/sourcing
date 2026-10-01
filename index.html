@@ -688,7 +688,7 @@ footer { background:var(--purple-fill); color:rgba(255,255,255,.6); padding:48px
   #reqTable td.empty { padding:18px 16px; }
 
   /* step 3: one card per supplier */
-  #resTable tbody tr:not(.why-row):not(.exc-toggle) { display:grid; grid-template-columns:34px 28px minmax(0,1fr) 44px;
+  #resTable tbody tr:not(.why-row):not(.exc-toggle):not(.grp-row) { display:grid; grid-template-columns:34px 28px minmax(0,1fr) 44px;
     grid-template-areas:"cb rank name x" ". type type type" ". contact contact contact" ". price price price" ". cap cap cap" ". room room room" ". src src src" ". flags flags flags";
     gap:8px 6px; padding:14px 12px 16px; }
   #resTable tbody tr > td:nth-child(1) { grid-area:cb; }
@@ -765,7 +765,7 @@ footer { background:var(--purple-fill); color:rgba(255,255,255,.6); padding:48px
 :root[data-theme="dark"] #logoMain, :root[data-theme="dark"] #logoLogin { filter:brightness(0) invert(1); opacity:.92; }
 :root[data-theme="dark"] footer { background:#0b0b20; }
 :root[data-theme="dark"] .field input, :root[data-theme="dark"] .field select, :root[data-theme="dark"] .field textarea,
-:root[data-theme="dark"] .login-form input, :root[data-theme="dark"] .why select, :root[data-theme="dark"] .save-form input { background:var(--input); }
+:root[data-theme="dark"] .login-form input, :root[data-theme="dark"] .why select, :root[data-theme="dark"] .save-form input { background-color:var(--input); }
 :root[data-theme="dark"] .field input:focus, :root[data-theme="dark"] .field select:focus, :root[data-theme="dark"] .field textarea:focus,
 :root[data-theme="dark"] .save-form input[type=text]:focus, :root[data-theme="dark"] .draft:focus { box-shadow:0 0 0 3px rgba(198,193,255,.22); }
 :root[data-theme="dark"] .demo-chip, :root[data-theme="dark"] .demo-banner, :root[data-theme="dark"] .demo-helper { border-color:#5a4a26; }
@@ -788,6 +788,22 @@ footer { background:var(--purple-fill); color:rgba(255,255,255,.6); padding:48px
 .theme-btn svg { width:17px; height:17px; display:block; }
 @media (max-width:720px){ .theme-btn { width:36px; height:36px; } }
 @media (max-width:420px){ .nav-right { gap:6px; } .nav-logo img { height:26px; } }
+/* ===== app 0.9.3 ===== */
+.field .amount-wrap select.amount-cur-sel { position:absolute; right:6px; top:50%; transform:translateY(-50%); width:auto; padding:5px 24px 5px 9px; border:0; border-radius:8px;
+  background-color:var(--bg); background-position:right 5px center; font-size:13px; font-weight:700; color:var(--muted); cursor:pointer; }
+.amount-wrap input#f_budget { padding-right:90px; }
+.mark-row { margin-top:6px; display:flex; flex-wrap:wrap; gap:6px; }
+.call-pill svg { flex:none; }
+.call-pill.on { background:var(--purple-fill); border-color:var(--purple-fill); color:#fff; }
+.rfq-actions .btn-outline svg, .sent-done svg { margin-right:4px; }
+/* header between phone and wide screen: short labels, no app name or user name, so nothing overlaps */
+@media (max-width:980px){ .nav-app, .user-chip span { display:none; } .nb-full { display:none; } .nb-short { display:inline; } }
+#resTable tr.grp-row > td { background:var(--bg); padding:14px 16px; border-top:2px solid var(--border); }
+.grp-head { font-size:12px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); margin-bottom:2px; }
+@media (max-width:720px){
+  #resTable tbody tr.grp-row { display:block; }
+  #resTable tr.grp-row > td { display:block; padding:14px 12px; }
+}
 </style>
 </head>
 <body>
@@ -965,7 +981,7 @@ footer { background:var(--purple-fill); color:rgba(255,255,255,.6); padding:48px
         <div class="reveal-block attached three">
           <div class="field"><label for="f_customer">Kund <span class="ftag int">Internt</span></label><input id="f_customer" type="text" placeholder="—"/></div>
           <div class="field"><label for="f_project">Projekt <span class="ftag int">Internt</span></label><input id="f_project" type="text" placeholder="—"/></div>
-          <div class="field"><label for="f_budget">Budget per person/mån <span class="ftag int">Internt</span></label><div class="amount-wrap"><input id="f_budget" type="number" min="0" placeholder="—"/><span class="amount-cur">EUR</span></div></div>
+          <div class="field"><label for="f_budget">Budget per person/mån <span class="ftag int">Internt</span></label><div class="amount-wrap"><input id="f_budget" type="number" min="0" placeholder="—"/><select id="f_budget_cur" class="amount-cur-sel" aria-label="Valuta för budgeten"><option>EUR</option><option>SEK</option><option>NOK</option><option>DKK</option><option>ISK</option><option>PLN</option><option>CZK</option><option>CHF</option><option>GBP</option></select></div></div>
           <div class="field"><label for="f_work">Exakt arbetsplats <span class="ftag int">Internt</span></label><input id="f_work" type="text" placeholder="—"/></div>
           <div class="field"><label for="f_contact">Kundkontakt <span class="ftag int">Internt</span></label><input id="f_contact" type="text" placeholder="—"/></div>
           <div class="field"><label for="f_notes">Interna anteckningar <span class="ftag int">Internt</span></label><input id="f_notes" type="text" placeholder="—"/></div>
@@ -1336,7 +1352,7 @@ footer { background:var(--purple-fill); color:rgba(255,255,255,.6); padding:48px
   </div>
   <div class="footer-bottom">
     <span>© Nordicta 2026</span>
-    <span>Nordicta Sourcing · app 0.9.2</span>
+    <span>Nordicta Sourcing · app 0.9.3</span>
   </div>
 </footer>
 
@@ -1407,7 +1423,7 @@ Max 20 min med bil, parkering för 4 bilar, kök önskas`;
 const OS_PARSED = {
   f_country:'Sverige', f_city:'Oskarshamn', f_area:'Oskarshamn och orter inom 20 min med bil', f_start:'2026-11-02', f_end:'2027-04-30',
   f_persons:'8', f_ppr:'1', f_twin:'Nej', f_furn:'Krävs', f_kitchen:'Önskas', f_wifi:'Krävs', f_parking:'4', f_dish:'', f_laundry:'',
-  f_customer:'Demo Energi AB', f_project:'Oskarshamn', f_budget:'938', f_work:'Industrigatan (demo), Oskarshamn',
+  f_customer:'Demo Energi AB', f_project:'Oskarshamn', f_budget:'938', f_budget_cur:'EUR', f_work:'Industrigatan (demo), Oskarshamn',
   f_contact:'', f_notes:'Budget 10 500 kr/pers/mån ≈ €938 (kurs 11,20). Max 20 min med bil. 4 P-platser.'
 };
 
@@ -1618,7 +1634,7 @@ const roomWord = r => r.ppr === 1 ? 'enkelrum' : r.twin === 'Nej' ? 'rum' : 'twi
 const roomWordEn = r => r.ppr === 1 ? 'single rooms' : r.twin === 'Nej' ? 'rooms' : 'twin rooms';
 const COUNTRY_EN = { Sverige:'Sweden', Norge:'Norway', Danmark:'Denmark', Finland:'Finland', Island:'Iceland', Tyskland:'Germany', Österrike:'Austria', Schweiz:'Switzerland', Nederländerna:'Netherlands', Holland:'Netherlands', Belgien:'Belgium', Frankrike:'France', Spanien:'Spain', Portugal:'Portugal', Italien:'Italy', Irland:'Ireland', Storbritannien:'United Kingdom', Polen:'Poland', Tjeckien:'Czech Republic', Slovakien:'Slovakia' };
 const countryEn = c => COUNTRY_EN[c] || c;
-const TB_MIN = 0.15;              // Nordicta minimum margin (TB) against the customer's price
+const TB_MIN = 0.30;              // Nordicta minimum margin (TB) against the customer's price
 const BRIDGE = ['S6','S7'];       // bridge supply – shown, but not counted as coverage
 const RESPONDED = ['Offert inlämnad','Avböjd','Förhandling'];
 function needsDe(r){
@@ -1650,18 +1666,25 @@ const cls = s => S.classOverride[s.id] || s.s;
 const contactable = s => s.contactable !== false;
 
 /* ---------- request ---------- */
+// approximate rates per EUR, the same as the rest of the page (a budget is an estimate; the rate is shown in step 1)
+const BUDGET_FX = { EUR:1, SEK:11.2, NOK:11.6, DKK:7.46, ISK:150, PLN:4.28, CZK:25.1, CHF:0.94, GBP:0.86 };
+function money(v, cur, d){
+  const n = fmt(v, d || 0);
+  return cur === 'EUR' || !cur ? '€' + n : cur === 'GBP' ? '£' + n : cur === 'SEK' ? n + ' kr' : n + ' ' + cur;
+}
 function req(){
   const v = id => (document.getElementById(id) || {}).value || '';
   const n = id => parseFloat(v(id)) || 0;
   const r = { country:v('f_country'), city:v('f_city'), area:v('f_area'), start:v('f_start'), end:v('f_end'),
     persons:Math.max(0, n('f_persons')), ppr:Math.max(1, Math.round(n('f_ppr')) || 2), twin:v('f_twin'), furn:v('f_furn'), kitchen:v('f_kitchen'),
     wifi:v('f_wifi'), parking:n('f_parking'), dish:v('f_dish'), laundry:v('f_laundry'), customer:v('f_customer'), project:v('f_project'),
-    budgetPerson:n('f_budget'), work:v('f_work'), contact:v('f_contact'), notes:v('f_notes') };
+    budgetLocal:n('f_budget'), budgetCur:BUDGET_FX[v('f_budget_cur')] ? v('f_budget_cur') : 'EUR', work:v('f_work'), contact:v('f_contact'), notes:v('f_notes') };
   r.valid = !!(r.start && r.end && D(r.end) > D(r.start) && r.persons > 0);
   r.nights = r.valid ? nightsBetween(r.start, r.end) : 0;
   r.months = r.valid ? Math.round(calMonths(r.start, r.end) * 100) / 100 : 0;
   r.rooms = r.persons ? Math.ceil(r.persons / r.ppr) : 0;
-  r.budget = r.budgetPerson * r.ppr;   // per room and month – what the price comparisons use
+  r.budgetPerson = r.budgetLocal / BUDGET_FX[r.budgetCur];   // EUR per person and month
+  r.budget = r.budgetPerson * r.ppr;   // EUR per room and month – what the price comparisons use
   return r;
 }
 
@@ -1791,10 +1814,10 @@ function renderCalc(){
   box.innerHTML =
     st('Längd', r.nights+' nätter', fmt(r.months,1)+' kalendermånader') +
     st('Rum som behövs', r.rooms, r.persons+' personer · '+r.ppr+' per rum') +
-    st('Kundbudget per person/mån', r.budgetPerson ? eur(r.budgetPerson) : '—', 'det kunden kan betala'+(r.budgetPerson && r.ppr > 1 ? ' · '+eur(r.budget)+' per rum' : ''), true) +
-    st('Max inköp per person/mån', r.budgetPerson ? eur(r.budgetPerson * (1 - TB_MIN)) : '—', 'för minst 15 % TB'+(r.budgetPerson && r.ppr > 1 ? ' · '+eur(maxBuy)+' per rum' : ''), true) +
-    st('Max inköp per person/natt', r.budgetPerson ? eur(r.budgetPerson * (1 - TB_MIN) * r.months / r.nights, 2) : '—', 'max inköp × månader ÷ nätter', true) +
-    st('Max kontraktsvärde', r.budgetPerson ? eur(r.budgetPerson * r.months * r.persons) : '—', 'kundbudget × '+r.persons+' personer × '+fmt(r.months,1)+' mån', true);
+    st('Kundbudget per person/mån', r.budgetLocal ? money(r.budgetLocal, r.budgetCur) : '—', 'det kunden kan betala'+(r.budgetLocal && r.ppr > 1 ? ' · '+money(r.budgetLocal * r.ppr, r.budgetCur)+' per rum' : '')+(r.budgetLocal && r.budgetCur !== 'EUR' ? ' · ≈ '+eur(r.budgetPerson)+' (kurs ca '+fmt(BUDGET_FX[r.budgetCur], 2)+' '+r.budgetCur+'/EUR)' : ''), true) +
+    st('Max inköp per person/mån', r.budgetLocal ? money(r.budgetLocal * (1 - TB_MIN), r.budgetCur) : '—', 'för minst '+Math.round(TB_MIN * 100)+' % TB'+(r.budgetLocal && r.ppr > 1 ? ' · '+money(r.budgetLocal * (1 - TB_MIN) * r.ppr, r.budgetCur)+' per rum' : ''), true) +
+    st('Max inköp per person/natt', r.budgetLocal ? money(r.budgetLocal * (1 - TB_MIN) * r.months / r.nights, r.budgetCur, r.budgetCur === 'EUR' ? 2 : 0) : '—', 'max inköp × månader ÷ nätter', true) +
+    st('Max kontraktsvärde', r.budgetLocal ? money(r.budgetLocal * r.months * r.persons, r.budgetCur) : '—', 'kundbudget × '+r.persons+' personer × '+fmt(r.months,1)+' mån', true);
 }
 function lockRequest(){
   const locked = Object.values(S.rfq || {}).some(q => q.sentMark);
@@ -1919,8 +1942,10 @@ function renderResults(){
     return '<button type="button" class="chip'+(on?' on':'')+'" data-type="'+t+'"'+(ids.length?'':' disabled style="opacity:.4;cursor:not-allowed"')+'>'+t+'</button>';
   }).join('');
   let h = '<thead><tr><th></th><th>#</th><th>Leverantör / objekt</th><th>Supplytyp · säkerhet</th><th>Kapacitet</th><th>'+(req().ppr === 1 ? 'Enkelrum' : 'Twin')+'</th><th>'+(DS.mode === 'live' ? 'Annonserat pris' : 'Indikativt pris')+'</th><th>Kontakt</th><th>Källa</th><th>Flaggor</th><th></th></tr></thead><tbody>';
-  SUP.forEach(s => {
+  const GROUPED = SUP.filter(x => !isMarket(x)).concat(SUP.filter(isMarket)); let grpShown = false;
+  GROUPED.forEach(s => {
     if (S.excluded.has(s.id) && !S.showExcluded) return;   // excluded rows are hidden unless "Visa exkluderade"
+    if (isMarket(s) && !grpShown) { grpShown = true; h += '<tr class="grp-row"><td colspan="11"><div class="grp-head">Marknadsplatser och annonssamlingar</div><div class="ssub">Annonser på plattformar som Qasa, Airbnb och Idealista, samt portaler och mellanhänder – inte hyresvärdarnas egna sidor. Kontakta oftast via plattformen.</div></td></tr>'; }
     const c = cls(s), sel = S.sel.has(s.id), exc = S.excluded.has(s.id), done = S.rfq[s.id] || S.manual[s.id];
     const dis = !contactable(s) || exc;
     h += '<tr class="'+(sel && !exc ? 'sel' : '')+(exc ? ' off' : '')+'">'+
@@ -2017,7 +2042,7 @@ $('#typeChips').addEventListener('click', e => {
   renderResults();
 });
 $('#btnRec').addEventListener('click', () => {
-  const withEmail = SUP.filter(s => s.email && contactable(s) && !S.excluded.has(s.id)).map(s => s.id);
+  const withEmail = SUP.filter(s => s.email && contactable(s) && !S.excluded.has(s.id) && !isMarket(s)).map(s => s.id);
   const drafts = Object.keys(S.rfq).map(Number);
   S.sel = new Set(withEmail.concat(drafts)); renderResults();
   const fresh = withEmail.filter(id => !S.rfq[id]).length, noEmail = SUP.filter(s => !s.email && !S.excluded.has(s.id) && !S.rfq[s.id]).length;
@@ -2511,11 +2536,11 @@ function renderRfq(){
     '<div class="rfq-actions">'+
       '<button type="button" class="btn" data-copy="body">'+IC_COPY+'<span>Kopiera mejltext</span></button>'+
       (q.sentMark ? '<span class="sent-done">'+IC.check+'Skickad '+esc(q.sentMark.at)+'</span><button type="button" class="linkbtn" data-mark="0">Ångra</button>'
-                  : '<button type="button" class="btn-outline" data-mark="1">'+IC.check+'Markera som skickad</button>')+
+                  : '<button type="button" class="btn-outline" data-mark="1">'+IC.check+'Markera som skickad</button>')+calledAction(sp)+
     '</div>';
   const r = req();
   $('#ckIn').innerHTML = supplierFacing().map(x => '<li><span class="i-ok">'+IC.check+'</span><span>'+esc(x[0])+': <span class="val">'+esc(x[1])+'</span></span></li>').join('');
-  const out = [['Kund', r.customer], ['Projekt', r.project], ['Budget', r.budgetPerson ? eur(r.budgetPerson)+'/person/mån' : ''], ['Exakt arbetsplats', r.work], ['Kundkontakt', r.contact], ['Interna anteckningar', r.notes]].filter(x => x[1]);
+  const out = [['Kund', r.customer], ['Projekt', r.project], ['Budget', r.budgetLocal ? money(r.budgetLocal, r.budgetCur)+'/person/mån' : ''], ['Exakt arbetsplats', r.work], ['Kundkontakt', r.contact], ['Interna anteckningar', r.notes]].filter(x => x[1]);
   $('#ckOut').innerHTML = out.map(x => '<li><span class="i-lock">'+IC.lock+'</span><span>'+esc(x[0])+': <span class="val">'+esc(x[1])+'</span></span></li>').join('') +
     '<li class="small muted" style="margin-top:6px">Den AI som skrev mejlet fick bara de leverantörssynliga fälten.</li>';
   let h = '<thead><tr><th>#</th><th>Leverantör</th><th>Typ</th><th>Referens</th><th>Språk</th><th>Status</th><th></th></tr></thead><tbody>';
@@ -2523,7 +2548,7 @@ function renderRfq(){
     const s2 = byId(id), q2 = S.rfq[id];
     h += '<tr'+(id === S.rfqView ? ' class="sel"' : '')+'><td class="rank">'+supNo(s2)+'</td><td><div class="sname">'+esc(s2.name)+'</div><div class="ssub">'+esc(s2.email || s2.manual || '')+'</div></td><td>'+sb(cls(s2))+'</td><td>'+q2.ref+'</td>'+
       '<td class="small">'+esc(RFQ_I18N[rfqLang(s2)].name)+'</td>'+
-      '<td>'+(q2.sentMark ? '<span class="status-dot ok">Skickad</span><div class="ssub">'+esc(q2.sentMark.at)+'</div>' : '<span class="status-dot open">Att skicka</span>')+'</td>'+
+      '<td>'+(q2.sentMark ? '<span class="status-dot ok">Skickad</span><div class="ssub">'+esc(q2.sentMark.at)+'</div>' : '<span class="status-dot open">Att skicka</span>')+(calledOf(id) ? '<div class="ssub">Ringd '+esc(calledOf(id).at)+'</div>' : '')+'</td>'+
       '<td style="white-space:nowrap"><button type="button" class="linkbtn" data-show="'+id+'">Visa text</button>'+(q2.sentMark ? '' : ' · <button type="button" class="linkbtn" data-unrfq="'+id+'">Ta bort</button>')+'</td></tr>';
   });
   $('#rfqTable').innerHTML = h + '</tbody>';
@@ -3366,7 +3391,7 @@ function warnings(o, m){
   if (o.notice >= 2) w.push(['w','Lång uppsägning']);
   if (o.noticeCode === 'fixed') w.push(['w','Fast bindning hela perioden']);
   if (o.tail) w.push(['w','Kontraktssvans '+o.tail+' mån']);
-  if (r.budget) { const tb = 1 - m.effRoom / r.budget; if (tb < 0) w.push(['int','Över kundbudget']); else if (tb < TB_MIN) w.push(['int','TB '+Math.round(tb*100)+' % (<15 %)']); }
+  if (r.budget) { const tb = 1 - m.effRoom / r.budget; if (tb < 0) w.push(['int','Över kundbudget']); else if (tb < TB_MIN) w.push(['int','TB '+Math.round(tb*100)+' % (<'+Math.round(TB_MIN * 100)+' %)']); }
   if (S.neg[o.sid]) w.push(['i','Förhandling · V'+S.neg[o.sid].v+' väntar']);
   return w;
 }
@@ -3490,7 +3515,7 @@ function renderCompare(){
     'Hotellpris per natt → månad: nattpris × '+r.nights+' nätter ÷ '+(S.norm === 'cal' ? fmt(r.months,1)+' kalendermånader' : fmt(r.nights/30,2)+' månader à 30 dagar')+'.',
     'True cost = hyra + antagna kostnader som inte ingår (utilities €45/rum/mån om exkluderat) + kontraktssvans utslagen över perioden. För S1 läggs möbelavskrivning, drift och 5 % reserv till.',
     'Kontrakt totalt = true cost × månader × rum + svanskostnad (hyra för bindningstid efter '+dSv(r.end)+').',
-    'TB mot kundbudget = 1 − true cost ÷ kundbudget per rum och månad. Nordictas minimum är 15 %. Visas bara internt.',
+    'TB mot kundbudget = 1 − true cost ÷ kundbudget per rum och månad. Nordictas minimum är 30 %. Visas bara internt.',
     'Parkering visas separat och ingår inte i jämförelsepriset.'
   ].map(t => '<li>'+esc(t)+'</li>').join('');
   $('#mixArea').innerHTML = mixHTML();
@@ -3586,7 +3611,7 @@ function openNegotiation(sid){
     const t = parseFloat($('#negTarget').value) || def;
     const opts = {}; $$('#negOpts .chip').forEach(c => opts[c.dataset.o] = c.classList.contains('on'));
     $('#negText').value = negDraft(o, t, opts);
-    $('#negHelp').textContent = 'Nu '+eur(mo.pr)+' · mål '+eur(t)+' ('+Math.round((1 - t / mo.pr) * 100)+' % under offerten).'+(maxBuy ? ' För 15 % TB behövs true cost ≤ '+eur(maxBuy)+'.' : '')+' Kundbudgeten nämns aldrig i mejlet.' + (localCur(req().country) !== 'EUR' ? ' I mejlet står målpriset i '+localCur(req().country)+': '+localMoney(t, req().country, 'sv-SE')+'.' : '');
+    $('#negHelp').textContent = 'Nu '+eur(mo.pr)+' · mål '+eur(t)+' ('+Math.round((1 - t / mo.pr) * 100)+' % under offerten).'+(maxBuy ? ' För '+Math.round(TB_MIN * 100)+' % TB behövs true cost ≤ '+eur(maxBuy)+'.' : '')+' Kundbudgeten nämns aldrig i mejlet.' + (localCur(req().country) !== 'EUR' ? ' I mejlet står målpriset i '+localCur(req().country)+': '+localMoney(t, req().country, 'sv-SE')+'.' : '');
   };
   regen();
   $('#negTarget').addEventListener('input', regen);
@@ -3696,6 +3721,7 @@ function miStatus(s){
   if (S.sel.has(s.id)) return '<span class="status-dot sent">Vald</span>';
   return '<span class="status-dot">Inte vald</span>';
 }
+{ const _miStatus = miStatus; miStatus = s => { const c = calledOf(s.id); return _miStatus(s) + (c ? ' <span class="status-dot sent">Ringd '+esc(c.at)+'</span>' : ''); }; }
 function miMedian(v){ const a = v.slice().sort((x, y) => x - y), m = Math.floor(a.length / 2); return a.length % 2 ? a[m] : (a[m - 1] + a[m]) / 2; }
 function miSpan(v){ if (!v.length) return '—'; const a = v.slice().sort((x, y) => x - y); return 'n='+a.length+' · '+eur(a[0])+(a.length > 1 ? '–'+eur(a[a.length - 1]) : '')+(a.length >= 5 ? ' · median '+eur(miMedian(a)) : ''); }
 // advertised prices from every search in the team; the same supplier and price counts once
@@ -3775,6 +3801,45 @@ function applyTheme(t){
   b.setAttribute('aria-label', b.title); b.setAttribute('aria-pressed', String(dark));
 }
 $('#btnTheme').addEventListener('click', () => { const t = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'; store.set('theme', t); applyTheme(t); });
+
+/* ---------- app 0.9.3: marked as called, marketplaces ---------- */
+const IC_PHONE = '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>';
+function calledMap(){ const ui = DS && DS.rec && DS.rec.ui; return (ui && ui.called) || {}; }
+function calledOf(id){ return calledMap()[id] || null; }
+function toggleCalled(id){
+  const sp = byId(id); if (!sp || !DS || !DS.rec || !CUR) return;
+  const m = Object.assign({}, calledMap());
+  if (m[id]) { delete m[id]; log('pm', 'Ångrade "ringd" för ' + sp.name); }
+  else { m[id] = { at:new Date().toLocaleString('sv-SE', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' }), by:me().name }; log('pm', 'Markerade ' + sp.name + ' som ringd'); }
+  DS.rec.ui = Object.assign({}, DS.rec.ui, { called:m });
+  if (DS.semi) REMOTE.saveUi(CUR, DS.rec.ui);
+  if (S.step === 3) renderResults(); else if (S.step === 4) renderRfq(); else if (S.step === 5) renderMI5();
+}
+function calledPill(sp){
+  const c = calledOf(sp.id);
+  return '<button type="button" class="sent-pill call-pill'+(c ? ' on' : '')+'" data-called="'+sp.id+'" aria-pressed="'+!!c+'" title="'+(c ? 'Ringd '+esc(c.at)+(c.by ? ' av '+esc(c.by) : '')+' · klicka för att ångra' : 'Bocka av när du har ringt leverantören')+'">'+IC_PHONE+(c ? 'Ringd '+esc(c.at) : 'Markera ringd')+'</button>';
+}
+function calledAction(sp){
+  const c = calledOf(sp.id);
+  return c ? '<span class="sent-done">'+IC_PHONE+'Ringd '+esc(c.at)+'</span><button type="button" class="linkbtn" data-called="'+sp.id+'">Ångra</button>'
+           : '<button type="button" class="btn-outline" data-called="'+sp.id+'">'+IC_PHONE+'Markera som ringd</button>';
+}
+{ const _sentToggle = sentToggle; sentToggle = sp => { const h = _sentToggle(sp); return h && contactable(sp) && h.endsWith('</div>') ? h.replace('<div style="margin-top:6px">', '<div class="mark-row">').slice(0, -6) + calledPill(sp) + '</div>' : h; }; }
+$('#resTable').addEventListener('click', e => { const b = e.target.closest('[data-called]'); if (b) toggleCalled(+b.dataset.called); });
+$('#mailView').addEventListener('click', e => { const b = e.target.closest('[data-called]'); if (b) toggleCalled(+b.dataset.called); });
+// Listings on platforms and portals (Qasa, Airbnb, Idealista …) and channels are listed last, under a heading of their own.
+// The same test runs on the server (hv-match.js isMarketplace), which also numbers them last in new searches.
+const MARKET_SITES = ['airbnb', 'booking.com', 'qasa', 'idealista', 'blocket', 'bostadsportal', 'homeq', 'samtrygg', 'hyresbostader', 'finn.no', 'hybel', 'boligportal', 'boligsiden',
+  'lejebolig', 'vuokraovi', 'oikotie', 'immobilienscout24', 'immowelt', 'kleinanzeigen', 'wg-gesucht', 'wunderflats', 'homelike', 'housinganywhere', 'spotahome', 'uniplaces',
+  'nestpick', 'funda', 'pararius', 'kamernet', 'leboncoin', 'seloger', 'fotocasa', 'habitaclia', 'milanuncios', 'immobiliare', 'subito', 'otodom', 'olx', 'gumtree',
+  'rightmove', 'zoopla', 'spareroom', 'vrbo', 'expedia', 'hotels.com', 'trivago', 'agoda', 'tripadvisor', 'facebook.com', 'nehnutelnosti', 'reality.sk', 'sreality'];
+function isMarket(s){
+  if (!s || s.existing || s.manualAdded) return false;
+  const c = cls(s); if (c === 'S7' || c === 'MI') return true;
+  if (/marknadsplats|portalannons|annonsportal/i.test(s.ch || '')) return true;
+  const host = String(s.url || '').replace(/^https?:[/][/]/i, '').split('/')[0].toLowerCase();
+  return MARKET_SITES.some(m => host.includes(m));
+}
 
 /* ---------- logos + init ---------- */
 const LOGO = $('#logoMain').src;
@@ -4006,6 +4071,7 @@ function openRequest(id){
   restoreRfqs(id);
   restoreChoices(id);
   FIELD_IDS.forEach(k => { document.getElementById(k).value = S.fields ? (S.fields[k] || '') : ''; });
+  if (!$('#f_budget_cur').value) $('#f_budget_cur').value = 'EUR';
   $('#reqText').value = S.reqText != null ? S.reqText : REQ_TEXT;
   $('#btnParse').querySelector('span').textContent = S.parsed ? 'Tolka igen' : 'Tolka med AI';
   $('#memStats').innerHTML = DS.memStats; $('#qEnLabel').textContent = DS.qLabels[0]; $('#qSkLabel').textContent = DS.qLabels[1]; $('#srcNote').innerHTML = DS.srcNote;
@@ -4136,20 +4202,25 @@ const REMOTE = (() => {
       f_dish:TXT[row.dishwasher] || '', f_laundry:LAUNDRY_TXT[row.laundry] || '',
       f_customer:str(p.customer_name), f_project:str(p.project), f_contact:str(p.contact_person), f_work:str(p.workplace),
       // 0.9.2: the budget is per person and month (older rows only had it per room: ÷ persons per room)
-      f_budget:p.budget_eur_person_month != null ? String(Math.round(p.budget_eur_person_month))
+      // 0.9.3: in the currency it was given in (budget_amount + budget_currency, basis person_manad); older rows only had EUR
+      f_budget:p.budget_amount != null && p.budget_basis === 'person_manad' ? String(Math.round(p.budget_amount))
+        : p.budget_eur_person_month != null ? String(Math.round(p.budget_eur_person_month))
         : p.budget_eur_room_month != null ? String(Math.round(p.budget_eur_room_month / Math.max(1, row.persons_per_room || 1))) : '',
+      f_budget_cur:p.budget_amount != null && p.budget_basis === 'person_manad' && p.budget_currency ? p.budget_currency : 'EUR',
       f_notes:str(p.notes) };
   }
   function fromFields(f){
     let a = iso(f.f_start), b = iso(f.f_end); if (a && b && b <= a) b = null;
     const persons = int(f.f_persons), ppr = int(f.f_ppr), budget = parseFloat(String(f.f_budget || '').replace(',', '.'));
+    const cur = BUDGET_FX[f.f_budget_cur] ? f.f_budget_cur : 'EUR', eurP = budget > 0 ? budget / BUDGET_FX[cur] : null;   // 0.9.3
     return {
       req:{ country:f.f_country || null, city:f.f_city || null, area:f.f_area || null, start_date:a, end_date:b,
         persons:persons > 0 ? persons : null, persons_per_room:ppr >= 1 && ppr <= 4 ? ppr : null,
         twin:code(f.f_twin), furnished:code(f.f_furn), kitchen:code(f.f_kitchen), wifi:code(f.f_wifi), dishwasher:code(f.f_dish), laundry:LAUNDRY_CODE[f.f_laundry] || null, parking_spaces:int(f.f_parking) || 0 },
       priv:{ customer_name:f.f_customer || null, project:f.f_project || null, contact_person:f.f_contact || null, workplace:f.f_work || null,
-        budget_eur_person_month:budget > 0 ? budget : null,
-        budget_eur_room_month:budget > 0 ? Math.round(budget * Math.max(1, ppr || 1) * 100) / 100 : null, notes:f.f_notes || null } };
+        budget_amount:budget > 0 ? budget : null, budget_currency:cur, budget_basis:budget > 0 ? 'person_manad' : null,
+        budget_eur_person_month:eurP != null ? Math.round(eurP * 100) / 100 : null,
+        budget_eur_room_month:eurP != null ? Math.round(eurP * Math.max(1, ppr || 1) * 100) / 100 : null, notes:f.f_notes || null } };
   }
   const WHO_OF = { person:'pm', ai:'ai', system:'sys', leverantor:'sup' }, ACTOR_OF = { pm:'person', ai:'ai', sys:'system', sup:'leverantor' };
   const hm = d => String(d.getHours()).padStart(2, '0')+':'+String(d.getMinutes()).padStart(2, '0');
@@ -4366,6 +4437,9 @@ function scheduleAutosave(){
 function flushAutosave(){ if (AUTOSAVE_T && DS && DS.semi && CUR) { clearTimeout(AUTOSAVE_T); AUTOSAVE_T = null; semiSaveRequest(!!(S && S.saved)); } }
 $('#structFields').addEventListener('input', scheduleAutosave);
 $('#structFields').addEventListener('change', scheduleAutosave);
+$('.reveal-block.three').addEventListener('input', scheduleAutosave);
+$('.reveal-block.three').addEventListener('change', scheduleAutosave);
+$('.reveal-block.three').addEventListener('change', renderCalc);
 $('#reqText').addEventListener('input', scheduleAutosave);
 window.addEventListener('beforeunload', flushAutosave);
 function restoreChoices(id){
@@ -4397,7 +4471,7 @@ function semiDataset(rec){
     runSteps: () => R ? R.steps : [], defaultSel: R ? R.sup.filter(x => x.rec).map(x => x.id) : [], portalPref: R ? R.portalPref : null,
     fetched: R ? R.fetched : '', runDate: R ? R.runDate : new Date().toISOString().slice(0, 10),
     qLabels: ['Sökfrågor · ' + (R ? R.localLangName : 'lokalt språk'), 'Sökfrågor · engelska'],
-    memStats: R ? SEMI_TILE('Orter inom 30 min', R.towns.length, R.towns.slice(0, 5).join(', ') + (R.towns.length > 5 ? ' m.fl.' : ''))
+    memStats: R ? SEMI_TILE('Orter inom 30–40 min', R.towns.length, R.towns.slice(0, 5).join(', ') + (R.towns.length > 5 ? ' m.fl.' : ''))
         + SEMI_TILE('Sökfrågor', R.stats.queries, R.qLocal.length + ' på ' + R.localLangName + ', ' + R.qEn.length + ' på engelska')
         + SEMI_TILE('Sidor lästa', R.stats.pages, R.stats.unique + ' unika träffar · ' + (R.stats.blocked.length ? R.stats.blocked.length + ' blockerade' : 'inga blockerade'))
         + SEMI_TILE('Körtid och kostnad', Math.floor(R.stats.durationS / 60) + ' min ' + (R.stats.durationS % 60) + ' s', 'API-kostnad $' + R.stats.cost.toFixed(2))
