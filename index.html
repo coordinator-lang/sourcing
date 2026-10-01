@@ -1160,7 +1160,7 @@ footer { background:var(--purple); color:rgba(255,255,255,.6); padding:48px 48px
   </div>
   <div class="footer-bottom">
     <span>© Nordicta 2026</span>
-    <span>Nordicta Sourcing · app 0.4.0</span>
+    <span>Nordicta Sourcing · app 0.5.0</span>
   </div>
 </footer>
 
@@ -3984,7 +3984,7 @@ function semiDataset(rec){
       : SEMI_TILE('Status', 'Ej sökt', 'starta sourcingen nedan') + SEMI_TILE('Tid', 'ca 5 min', 'körs i bakgrunden på servern')
         + SEMI_TILE('Kostnad', 'ca $2–3', 'tak $4 per sökning') + SEMI_TILE('Dagens sökningar', q ? q.runsToday + '/' + q.maxRunsPerDay : '–', 'gräns per dag'),
     srcNote: SRC_NOTE_BASE + (R ? 'Riktiga källor, hämtade ' + R.fetched + '.' + (R.stats.blocked.length ? ' Blockerade läsningen: ' + R.stats.blocked.join(', ') + '.' : '') + (R.notes ? ' ' + R.notes : '') : ''),
-    resSum: n => R ? '<b>' + R.stats.unique + '</b> träffar · <b>' + R.stats.suppliers + '</b> leverantörer + ' + R.stats.channels + ' kanaler · <b>' + n + '</b> med e-post · sökt ' + R.fetched : '' };
+    resSum: n => R ? '<b>' + R.stats.unique + '</b> träffar · <b>' + R.stats.suppliers + '</b> leverantörer + ' + R.stats.channels + ' kanaler · <b>' + n + '</b> med e-post' + (R.stats.hvKnown ? ' · <b>' + R.stats.hvKnown + '</b> finns i HV-Databasen (överst)' : '') + ' · sökt ' + R.fetched : '' };
 }
 function updateReqMeta(id){
   const q = reqById(id), ds = DATASETS[id], f = (STATES[id] && STATES[id].fields) || ds.rec.fields || {};
