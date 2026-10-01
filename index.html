@@ -253,6 +253,7 @@ table.t td { padding:12px; border-bottom:1px solid var(--line); vertical-align:t
 table.t tr:last-child td { border-bottom:none; }
 table.t tr.sel > td { background:#faf9fd; }
 table.t tr.off > td { opacity:.45; }
+table.t tr.exc-toggle > td { padding:12px 16px; background:var(--bg); text-align:center; }
 table.t td.num, table.t th.num { text-align:right; white-space:nowrap; font-variant-numeric:tabular-nums; }
 table.t .strong { font-weight:700; color:var(--purple); }
 .sname { font-weight:600; color:var(--text); }
@@ -1160,7 +1161,7 @@ footer { background:var(--purple); color:rgba(255,255,255,.6); padding:48px 48px
   </div>
   <div class="footer-bottom">
     <span>© Nordicta 2026</span>
-    <span>Nordicta Sourcing · app 0.6.1</span>
+    <span>Nordicta Sourcing · app 0.6.2</span>
   </div>
 </footer>
 
@@ -1743,6 +1744,7 @@ function renderResults(){
   }).join('');
   let h = '<thead><tr><th></th><th>#</th><th>Leverantör / objekt</th><th>Supplytyp · säkerhet</th><th>Kapacitet</th><th>'+(req().ppr === 1 ? 'Enkelrum' : 'Twin')+'</th><th>'+(DS.mode === 'live' ? 'Annonserat pris' : 'Indikativt pris')+'</th><th>Kontakt</th><th>Källa</th><th>Flaggor</th><th></th></tr></thead><tbody>';
   SUP.forEach(s => {
+    if (S.excluded.has(s.id) && !S.showExcluded) return;   // excluded rows are hidden unless "Visa exkluderade"
     const c = cls(s), sel = S.sel.has(s.id), exc = S.excluded.has(s.id), done = S.rfq[s.id] || S.manual[s.id];
     const dis = !contactable(s) || exc;
     h += '<tr class="'+(sel && !exc ? 'sel' : '')+(exc ? ' off' : '')+'">'+
@@ -1757,7 +1759,7 @@ function renderResults(){
       '<td class="c-contact">'+contactCell(s)+'</td>'+
       '<td class="c-src">'+srcCell(s)+'</td>'+
       '<td class="c-flags">'+flagsHTML(s.flags)+'</td>'+
-      '<td><button type="button" class="iconbtn'+(exc?' on':'')+'" data-exc="'+s.id+'" title="'+(exc?'Ta tillbaka':'Exkludera')+'" aria-label="Exkludera">'+IC.x+'</button></td>'+
+      '<td><button type="button" class="iconbtn'+(exc?' on':'')+'" data-exc="'+s.id+'" title="'+(s.manualAdded ? 'Ta bort' : exc ? 'Ta tillbaka' : 'Exkludera (döljs)')+'" aria-label="Exkludera">'+IC.x+'</button></td>'+
     '</tr>';
     if (S.openWhy.has(s.id)) {
       const opts = ['S1','S2','S3','S4','S5','S6','S7','MI'].map(o => '<option value="'+o+'"'+(o===c?' selected':'')+'>'+(o==='MI'?'Mellanhand (kanal)':o+' · '+STYPE[o])+'</option>').join('');
@@ -1768,6 +1770,8 @@ function renderResults(){
       '</div></td></tr>';
     }
   });
+  const nExc = SUP.filter(x => S.excluded.has(x.id)).length;
+  if (nExc) h += '<tr class="exc-toggle"><td colspan="11"><button type="button" class="linkbtn" data-showexc>'+(S.showExcluded ? 'Dölj exkluderade' : 'Visa '+nExc+' exkluderad'+(nExc > 1 ? 'e' : ''))+'</button></td></tr>';
   $('#resTable').innerHTML = h + '</tbody>';
   renderSelBar();
 }
@@ -1822,6 +1826,8 @@ $('#resTable').addEventListener('click', e => {
   const x = e.target.closest('[data-exc]');
   if (x) {
     const id = +x.dataset.exc, s = byId(id);
+    if (s && s.manualAdded) { deleteManual(id); return; }
+    if (!S.excluded.has(id)) toast((s ? s.name : 'Leverantören')+' är exkluderad. "Visa exkluderade" längst ner tar fram den igen.');
     if (S.excluded.has(id)) { S.excluded.delete(id); log('pm','Tog tillbaka '+s.name); }
     else { S.excluded.add(id); S.sel.delete(id); removeDraft(id); log('pm','Exkluderade '+s.name); }
     renderResults();
@@ -4015,6 +4021,20 @@ async function saveManualSupplier(){
 }
 // The number shown for a supplier: search rows 1, 2, 3 …; manually added rows M1, M2 …
 function supNo(s){ return !s ? '' : s.manualAdded ? 'M' + (s.id - 1000) : String(s.id); }
+$('#resTable').addEventListener('click', e => { if (e.target.closest('[data-showexc]')) { S.showExcluded = !S.showExcluded; renderResults(); } });
+// A manually added supplier is deleted for real (it is not a search result that can come back).
+function deleteManual(id){
+  const s = byId(id); if (!s) return;
+  if (S.rfq[id] && S.rfq[id].sentMark) { toast('Markerad som skickad – ångra bocken först om den ska tas bort'); return; }
+  removeDraft(id);
+  const i = SUP.indexOf(s); if (i >= 0) SUP.splice(i, 1);
+  delete SHORT[id]; S.sel.delete(id); S.excluded.delete(id);
+  const ds = DATASETS[CUR], ui = ds.rec.ui || {};
+  ds.rec.ui = Object.assign({}, ui, { manualSup:(ui.manualSup || []).filter(x => x.id !== id) });
+  REMOTE.saveUi(CUR, ds.rec.ui);
+  log('pm','Tog bort manuellt tillagd leverantör: '+s.name);
+  renderResults(); toast(supNo(s)+' '+s.name+' är borttagen');
+}
 let AUTOSAVE_T = null, CHOICES_T = null;
 function scheduleAutosave(){
   if (!(DS && DS.semi && CUR)) return;
