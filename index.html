@@ -733,6 +733,7 @@ footer { background:var(--purple); color:rgba(255,255,255,.6); padding:48px 48px
   .hero-eyebrow { letter-spacing:.1em; }
   .flag { font-size:11px; }
 }
+@media (min-width:981px){ #structFields .f-laundry { grid-column:span 2; } }
 </style>
 </head>
 <body>
@@ -899,7 +900,8 @@ footer { background:var(--purple); color:rgba(255,255,255,.6); padding:48px 48px
           <div class="field"><label for="f_kitchen">Kök <span class="ftag sup">Synlig</span></label><select id="f_kitchen"><option value="">—</option><option>Krävs</option><option>Önskas</option><option>Inte nödvändigt</option></select></div>
           <div class="field"><label for="f_wifi">Wi-Fi <span class="ftag sup">Synlig</span></label><select id="f_wifi"><option value="">—</option><option>Krävs</option><option>Önskas</option><option>Nej</option></select></div>
           <div class="field"><label for="f_parking">Parkeringsplatser <span class="ftag sup">Synlig</span></label><input id="f_parking" type="number" min="0" placeholder="—"/></div>
-          <div class="field"><label for="f_invoice">Företagsfaktura <span class="ftag sup">Synlig</span></label><select id="f_invoice"><option value="">—</option><option>Krävs</option><option>Önskas</option><option>Nej</option></select></div>
+          <div class="field"><label for="f_dish">Diskmaskin <span class="ftag sup">Synlig</span></label><select id="f_dish"><option value="">—</option><option>Krävs</option><option>Önskas</option><option>Nej</option></select></div>
+          <div class="field f-laundry"><label for="f_laundry">Tvättmaskin/tvättstuga <span class="ftag sup">Synlig</span></label><select id="f_laundry"><option value="">—</option><option>Tvättmaskin i bostaden krävs</option><option>Tvättmaskin eller tvättstuga krävs</option><option>Önskas</option><option>Nej</option></select></div>
         </div>
         <p class="field-helper" id="lockNote" hidden>Förfrågan är låst eftersom RFQ:er redan har skickats. Leverantörerna har fått de här uppgifterna, så ändringar görs som en ny version av förfrågan. Interna fält går fortfarande att ändra.</p>
       </div>
@@ -1242,7 +1244,7 @@ footer { background:var(--purple); color:rgba(255,255,255,.6); padding:48px 48px
   </div>
   <div class="footer-bottom">
     <span>© Nordicta 2026</span>
-    <span>Nordicta Sourcing · app 0.7.0</span>
+    <span>Nordicta Sourcing · app 0.8.0</span>
   </div>
 </footer>
 
@@ -1312,7 +1314,7 @@ Max 20 min med bil, parkering för 4 bilar, kök önskas`;
 
 const OS_PARSED = {
   f_country:'Sverige', f_city:'Oskarshamn', f_area:'Oskarshamn och orter inom 20 min med bil', f_start:'2026-11-02', f_end:'2027-04-30',
-  f_persons:'8', f_ppr:'1', f_twin:'Nej', f_furn:'Krävs', f_kitchen:'Önskas', f_wifi:'Krävs', f_parking:'4', f_invoice:'Krävs',
+  f_persons:'8', f_ppr:'1', f_twin:'Nej', f_furn:'Krävs', f_kitchen:'Önskas', f_wifi:'Krävs', f_parking:'4', f_dish:'', f_laundry:'',
   f_customer:'Demo Energi AB', f_project:'Oskarshamn', f_budget:'938', f_work:'Industrigatan (demo), Oskarshamn',
   f_contact:'', f_notes:'Budget 10 500 kr/pers/mån ≈ €938 (kurs 11,20). Max 20 min med bil. 4 P-platser.'
 };
@@ -1405,7 +1407,7 @@ Inköpsansvarig, Demo Industri AB – Projekt Tatra`;
 
 const PS_PARSED = {
   f_country:'Slovakien', f_city:'Prešov', f_area:'Solivar eller centrum', f_start:'2026-11-01', f_end:'2027-06-30',
-  f_persons:'20', f_ppr:'2', f_twin:'Krävs', f_furn:'Krävs', f_kitchen:'Önskas', f_wifi:'Krävs', f_parking:'4', f_invoice:'Krävs',
+  f_persons:'20', f_ppr:'2', f_twin:'Krävs', f_furn:'Krävs', f_kitchen:'Önskas', f_wifi:'Krävs', f_parking:'4', f_dish:'', f_laundry:'',
   f_customer:'Demo Industri AB', f_project:'Projekt Tatra', f_budget:'450', f_work:'Industripark Solivar (fiktiv)',
   f_contact:'Inköpsansvarig (fiktiv)', f_notes:'Kunden kan vilja förlänga till hösten 2027 – nämns inte för leverantörer.'
 };
@@ -1561,7 +1563,7 @@ function req(){
   const n = id => parseFloat(v(id)) || 0;
   const r = { country:v('f_country'), city:v('f_city'), area:v('f_area'), start:v('f_start'), end:v('f_end'),
     persons:Math.max(0, n('f_persons')), ppr:Math.max(1, Math.round(n('f_ppr')) || 2), twin:v('f_twin'), furn:v('f_furn'), kitchen:v('f_kitchen'),
-    wifi:v('f_wifi'), parking:n('f_parking'), invoice:v('f_invoice'), customer:v('f_customer'), project:v('f_project'),
+    wifi:v('f_wifi'), parking:n('f_parking'), dish:v('f_dish'), laundry:v('f_laundry'), customer:v('f_customer'), project:v('f_project'),
     budget:n('f_budget'), work:v('f_work'), contact:v('f_contact'), notes:v('f_notes') };
   r.valid = !!(r.start && r.end && D(r.end) > D(r.start) && r.persons > 0);
   r.nights = r.valid ? nightsBetween(r.start, r.end) : 0;
@@ -2018,7 +2020,8 @@ function supplierFacing(){
     ['Kök', r.kitchen],
     ['Wi-Fi', r.wifi],
     ['Parkering', r.parking ? r.parking+' platser' : 'Behövs inte'],
-    ['Företagsfaktura', r.invoice]
+    ['Diskmaskin', r.dish || '—'],
+    ['Tvätt', r.laundry || '—']
   ];
 }
 /* ---------- notice periods (labels as in Nordicta's Monday boards) ---------- */
@@ -2233,11 +2236,30 @@ function rfqGreeting(s, code){
   if (code === 'en' && s.first) return 'Hello '+s.first+',';
   return RFQ_I18N[code].greet;
 }
+// 0.8.0: dishwasher [required, preferred]; wash [washing machine in the accommodation, washing machine or laundry room, preferred]
+const RFQ_EXTRA = {
+  sv: { dish:['Diskmaskin krävs','Diskmaskin önskas'], wash:['Tvättmaskin i bostaden krävs','Tvättmaskin eller tvättstuga krävs','Tvättmaskin eller tvättstuga önskas'] },
+  no: { dish:['Oppvaskmaskin kreves','Oppvaskmaskin ønskes'], wash:['Vaskemaskin i boligen kreves','Vaskemaskin eller fellesvaskeri kreves','Vaskemaskin eller fellesvaskeri ønskes'] },
+  da: { dish:['Opvaskemaskine påkrævet','Opvaskemaskine ønskes'], wash:['Vaskemaskine i boligen påkrævet','Vaskemaskine eller fælles vaskeri påkrævet','Vaskemaskine eller fælles vaskeri ønskes'] },
+  fi: { dish:['Astianpesukone vaaditaan','Astianpesukone toivottu'], wash:['Pyykinpesukone asunnossa vaaditaan','Pyykinpesukone tai pesutupa vaaditaan','Pyykinpesukone tai pesutupa toivottu'] },
+  de: { dish:['Geschirrspüler erforderlich','Geschirrspüler erwünscht'], wash:['Waschmaschine in der Unterkunft erforderlich','Waschmaschine oder Waschküche erforderlich','Waschmaschine oder Waschküche erwünscht'] },
+  en: { dish:['Dishwasher required','Dishwasher preferred'], wash:['Washing machine in the accommodation required','Washing machine or laundry room required','Washing machine or laundry room preferred'] },
+  nl: { dish:['Vaatwasser vereist','Bij voorkeur een vaatwasser'], wash:['Wasmachine in de woning vereist','Wasmachine of gemeenschappelijke wasruimte vereist','Bij voorkeur een wasmachine of gemeenschappelijke wasruimte'] },
+  fr: { dish:['Lave-vaisselle requis','Lave-vaisselle souhaité'], wash:['Lave-linge dans le logement requis','Lave-linge ou buanderie requis','Lave-linge ou buanderie souhaité'] },
+  es: { dish:['Lavavajillas necesario','Preferiblemente con lavavajillas'], wash:['Lavadora en el alojamiento necesaria','Lavadora o lavandería comunitaria necesaria','Preferiblemente con lavadora o lavandería comunitaria'] },
+  pt: { dish:['Máquina de lavar loiça obrigatória','De preferência com máquina de lavar loiça'], wash:['Máquina de lavar roupa no alojamento obrigatória','Máquina de lavar roupa ou lavandaria comum obrigatória','De preferência com máquina de lavar roupa ou lavandaria comum'] },
+  it: { dish:['Lavastoviglie richiesta','Preferibilmente con lavastoviglie'], wash:["Lavatrice nell'alloggio richiesta",'Lavatrice o lavanderia condominiale richiesta','Preferibilmente con lavatrice o lavanderia condominiale'] },
+  pl: { dish:['Wymagana zmywarka','Preferowana zmywarka'], wash:['Wymagana pralka w mieszkaniu','Wymagana pralka lub pralnia','Preferowana pralka lub pralnia'] },
+  sk: { dish:['Nutná umývačka riadu','Preferujeme umývačku riadu'], wash:['Nutná práčka v ubytovaní','Nutná práčka alebo práčovňa','Preferujeme práčku alebo práčovňu'] }
+};
+Object.keys(RFQ_I18N).forEach(k => Object.assign(RFQ_I18N[k], RFQ_EXTRA[k] || RFQ_EXTRA.en));
+const WASH_IX = { 'Tvättmaskin i bostaden krävs':0, 'Tvättmaskin eller tvättstuga krävs':1, 'Önskas':2 };
 function rfqNeeds(r, L){
   const out = [], p = (v, arr) => { if (v === 'Krävs') out.push(arr[0]); else if (v === 'Önskas') out.push(arr[1]); };
-  p(r.furn, L.furn); p(r.kitchen, L.kitchen); p(r.wifi, L.wifi);
+  p(r.furn, L.furn); p(r.kitchen, L.kitchen); p(r.dish, L.dish);
+  if (r.laundry in WASH_IX) out.push(L.wash[WASH_IX[r.laundry]]);
+  p(r.wifi, L.wifi);
   if (r.parking) out.push(L.parking(r.parking));
-  if (r.invoice === 'Krävs' || r.invoice === 'Önskas') out.push(L.invoice);
   return out;
 }
 function mailHTML(s, q0){
@@ -3899,6 +3921,9 @@ const REMOTE = (() => {
   }
   /* request row ⇄ the page's fields (f_*) */
   const TXT = { kravs:'Krävs', onskas:'Önskas', nej:'Nej' };
+  // 0.8.0: Tvättmaskin/tvättstuga (column laundry)
+  const LAUNDRY_TXT = { maskin:'Tvättmaskin i bostaden krävs', maskin_eller_stuga:'Tvättmaskin eller tvättstuga krävs', onskas:'Önskas', nej:'Nej' };
+  const LAUNDRY_CODE = Object.fromEntries(Object.entries(LAUNDRY_TXT).map(([k, v]) => [v, k]));
   const code = v => v === 'Krävs' ? 'kravs' : v === 'Önskas' ? 'onskas' : (v === 'Nej' || v === 'Inte nödvändigt') ? 'nej' : null;
   const int = v => /^\s*\d+\s*$/.test(String(v == null ? '' : v)) ? parseInt(v, 10) : null;
   const iso = v => /^\d{4}-\d{2}-\d{2}$/.test(v || '') ? v : null;
@@ -3908,7 +3933,8 @@ const REMOTE = (() => {
     return { f_country:str(row.country), f_city:str(row.city), f_area:str(row.area), f_start:str(row.start_date), f_end:str(row.end_date),
       f_persons:row.persons != null ? String(row.persons) : '', f_ppr:row.persons_per_room != null ? String(row.persons_per_room) : '',
       f_twin:TXT[row.twin] || '', f_furn:TXT[row.furnished] || '', f_kitchen:row.kitchen === 'nej' ? 'Inte nödvändigt' : (TXT[row.kitchen] || ''),
-      f_wifi:TXT[row.wifi] || '', f_parking:row.parking_spaces ? String(row.parking_spaces) : '', f_invoice:TXT[row.invoice] || '',
+      f_wifi:TXT[row.wifi] || '', f_parking:row.parking_spaces ? String(row.parking_spaces) : '',
+      f_dish:TXT[row.dishwasher] || '', f_laundry:LAUNDRY_TXT[row.laundry] || '',
       f_customer:str(p.customer_name), f_project:str(p.project), f_contact:str(p.contact_person), f_work:str(p.workplace),
       f_budget:p.budget_eur_room_month != null ? String(Math.round(p.budget_eur_room_month)) : '', f_notes:str(p.notes) };
   }
@@ -3918,7 +3944,7 @@ const REMOTE = (() => {
     return {
       req:{ country:f.f_country || null, city:f.f_city || null, area:f.f_area || null, start_date:a, end_date:b,
         persons:persons > 0 ? persons : null, persons_per_room:ppr >= 1 && ppr <= 4 ? ppr : null,
-        twin:code(f.f_twin), furnished:code(f.f_furn), kitchen:code(f.f_kitchen), wifi:code(f.f_wifi), invoice:code(f.f_invoice), parking_spaces:int(f.f_parking) || 0 },
+        twin:code(f.f_twin), furnished:code(f.f_furn), kitchen:code(f.f_kitchen), wifi:code(f.f_wifi), dishwasher:code(f.f_dish), laundry:LAUNDRY_CODE[f.f_laundry] || null, parking_spaces:int(f.f_parking) || 0 },
       priv:{ customer_name:f.f_customer || null, project:f.f_project || null, contact_person:f.f_contact || null, workplace:f.f_work || null,
         budget_eur_room_month:budget > 0 ? budget : null, notes:f.f_notes || null } };
   }
@@ -3933,7 +3959,7 @@ const REMOTE = (() => {
       result:done ? done.result : null, cost:done ? Number(done.cost_usd || 0) : 0,
       log:(row.events || []).map(e => ({ t:hm(new Date(e.occurred_at)), who:WHO_OF[e.actor_type] || 'sys', txt:e.summary, by:e.actor_type === 'person' ? SOURCING_USER.name : null })) };
   }
-  const SELECT = 'select=id,ref,created_at,source_text,saved,ui,country,city,area,start_date,end_date,persons,persons_per_room,twin,furnished,kitchen,wifi,invoice,parking_spaces,'
+  const SELECT = 'select=id,ref,created_at,source_text,saved,ui,country,city,area,start_date,end_date,persons,persons_per_room,twin,furnished,kitchen,wifi,dishwasher,laundry,parking_spaces,'
     + 'request_private(*),latest:search_runs(id,status,error,cost_usd,created_at),done:search_runs(result,cost_usd,created_at,status),events(occurred_at,actor_type,summary)'
     + '&latest.order=created_at.desc&latest.limit=1&done.status=eq.klar&done.order=created_at.desc&done.limit=1&events.order=occurred_at.asc';
   const loadAll = async () => (await rest('GET', 'requests?' + SELECT + '&order=created_at.asc')).map(toRec);
@@ -3959,7 +3985,7 @@ const REMOTE = (() => {
     m = path.match(/^\/api\/runs\/([0-9a-f-]+)$/);
     if (m && method === 'POST') {
       // only what the search may use – customer, budget, contact and notes never leave the page
-      const safe = {}; ['f_country','f_city','f_area','f_work','f_start','f_end','f_persons','f_ppr','f_twin','f_furn','f_kitchen','f_wifi','f_parking','f_invoice'].forEach(k => { safe[k] = (b.fields || {})[k] || ''; });
+      const safe = {}; ['f_country','f_city','f_area','f_work','f_start','f_end','f_persons','f_ppr','f_twin','f_furn','f_kitchen','f_wifi','f_dish','f_laundry','f_parking'].forEach(k => { safe[k] = (b.fields || {})[k] || ''; });
       const r = await fn('start', { request_id:m[1], fields:safe });
       RUNS[m[1]] = r.run_id;
       return { ok:true };
