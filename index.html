@@ -1160,7 +1160,7 @@ footer { background:var(--purple); color:rgba(255,255,255,.6); padding:48px 48px
   </div>
   <div class="footer-bottom">
     <span>© Nordicta 2026</span>
-    <span>Nordicta Sourcing · app 0.5.0</span>
+    <span>Nordicta Sourcing · app 0.6.0</span>
   </div>
 </footer>
 
@@ -1744,10 +1744,10 @@ function renderResults(){
   let h = '<thead><tr><th></th><th>#</th><th>Leverantör / objekt</th><th>Supplytyp · säkerhet</th><th>Kapacitet</th><th>'+(req().ppr === 1 ? 'Enkelrum' : 'Twin')+'</th><th>'+(DS.mode === 'live' ? 'Annonserat pris' : 'Indikativt pris')+'</th><th>Kontakt</th><th>Källa</th><th>Flaggor</th><th></th></tr></thead><tbody>';
   SUP.forEach(s => {
     const c = cls(s), sel = S.sel.has(s.id), exc = S.excluded.has(s.id), done = S.rfq[s.id] || S.manual[s.id];
-    const dis = !contactable(s) || exc || done;
+    const dis = !contactable(s) || exc;
     h += '<tr class="'+(sel && !exc ? 'sel' : '')+(exc ? ' off' : '')+'">'+
       (S.rfq[s.id] && S.rfq[s.id].sentMark ? '<td><span class="sent-tick" title="RFQ skickad '+esc(S.rfq[s.id].sentMark.at)+'" aria-label="RFQ skickad">'+IC.check+'</span></td>'
-        : '<td><label class="cb'+(dis?' disabled':'')+'" title="'+(!contactable(s)?(s.noReason || 'Kan inte kontaktas utanför plattformen'):done?'RFQ-texten finns i steg 4':'')+'"><input type="checkbox" data-sel="'+s.id+'"'+(sel && !exc ? ' checked' : '')+(dis?' disabled':'')+'><span class="cbx"></span></label></td>')+
+        : '<td><label class="cb'+(dis?' disabled':'')+'" title="'+(!contactable(s)?(s.noReason || 'Kan inte kontaktas utanför plattformen'):done?'RFQ-text skapad. Ta bort krysset för att ta bort leverantören från RFQ-listan.':'')+'"><input type="checkbox" data-sel="'+s.id+'"'+((sel || S.rfq[s.id]) && !exc ? ' checked' : '')+(dis?' disabled':'')+'><span class="cbx"></span></label></td>')+
       '<td class="rank">'+s.id+'</td>'+
       '<td class="c-name"><div class="sname">'+esc(s.name)+'</div><div class="ssub">'+esc(s.obj)+'</div>'+(s.existing?'<div class="ssub ok">★ '+esc(s.prev)+'</div>':'')+(s.known?'<div class="ssub" style="color:var(--gold-ink)">↺ '+esc(s.known)+'</div>':'')+'<button type="button" class="linkbtn" data-why="'+s.id+'">'+(S.openWhy.has(s.id)?'Dölj':'Varför?')+'</button></td>'+
       '<td class="c-type">'+sb(c)+'<div class="ssub">'+esc(STYPE[c])+'</div>'+(S.classOverride[s.id]?'<div class="ssub" style="color:var(--gold-ink)">ändrad av PM</div>':'')+'<div style="margin-top:7px">'+confBar(s.conf)+'</div></td>'+
@@ -1805,7 +1805,7 @@ function renderSelBar(){
 }
 $('#resTable').addEventListener('change', e => {
   const cb = e.target.closest('[data-sel]');
-  if (cb) { const id = +cb.dataset.sel; cb.checked ? S.sel.add(id) : S.sel.delete(id); renderResults(); return; }
+  if (cb) { const id = +cb.dataset.sel; if (cb.checked) S.sel.add(id); else { S.sel.delete(id); removeDraft(id); } renderResults(); return; }
   const rc = e.target.closest('[data-reclass]');
   if (rc) {
     const s = byId(+rc.dataset.reclass), from = cls(s), to = rc.value;
@@ -1823,7 +1823,7 @@ $('#resTable').addEventListener('click', e => {
   if (x) {
     const id = +x.dataset.exc, s = byId(id);
     if (S.excluded.has(id)) { S.excluded.delete(id); log('pm','Tog tillbaka '+s.name); }
-    else { S.excluded.add(id); S.sel.delete(id); log('pm','Exkluderade '+s.name); }
+    else { S.excluded.add(id); S.sel.delete(id); removeDraft(id); log('pm','Exkluderade '+s.name); }
     renderResults();
   }
 });
@@ -1836,7 +1836,7 @@ $('#typeChips').addEventListener('click', e => {
 });
 $('#btnRec').addEventListener('click', () => { S.sel = new Set(SUP.filter(s => s.rec && contactable(s) && !S.excluded.has(s.id)).map(s => s.id)); renderResults(); const ids = [...S.sel].filter(id => !S.rfq[id] && !S.manual[id]).sort((a,b) => a-b); toast(ids.length ? 'Rekommenderade valda: '+ids.join(', ') : 'Alla rekommenderade är redan kontaktade'); });
 $('#btnNone').addEventListener('click', () => { S.sel.clear(); renderResults(); });
-$('#btnAddManual').addEventListener('click', () => toast('I verktyget: formulär för ny leverantör med dubblettkontroll mot domän, e-post och telefon'));
+$('#btnAddManual').addEventListener('click', () => openManualSupplier());
 
 function openSendModal(target){
   if (!canSend()) { toast(sendBlockMsg()); return; }
@@ -2309,7 +2309,7 @@ function renderRfq(){
     h += '<tr'+(id === S.rfqView ? ' class="sel"' : '')+'><td class="rank">'+id+'</td><td><div class="sname">'+esc(s2.name)+'</div><div class="ssub">'+esc(s2.email || s2.manual || '')+'</div></td><td>'+sb(cls(s2))+'</td><td>'+q2.ref+'</td>'+
       '<td class="small">'+esc(RFQ_I18N[rfqLang(s2)].name)+'</td>'+
       '<td>'+(q2.sentMark ? '<span class="status-dot ok">Skickad</span><div class="ssub">'+esc(q2.sentMark.at)+'</div>' : '<span class="status-dot open">Att skicka</span>')+'</td>'+
-      '<td><button type="button" class="linkbtn" data-show="'+id+'">Visa text</button></td></tr>';
+      '<td style="white-space:nowrap"><button type="button" class="linkbtn" data-show="'+id+'">Visa text</button>'+(q2.sentMark ? '' : ' · <button type="button" class="linkbtn" data-unrfq="'+id+'">Ta bort</button>')+'</td></tr>';
   });
   $('#rfqTable').innerHTML = h + '</tbody>';
 }
@@ -3910,7 +3910,8 @@ const REMOTE = (() => {
     try { await rest('PATCH', 'requests?id=eq.' + id, { ui }, 'return=minimal'); }
     catch (e) { toast('Bocken kunde inte sparas: ' + e.message); }
   }
-  return { handle, drive, logLine, saveUi, UUID };
+  const hvLookup = ors => rest('GET', 'hv_landlords?select=objekt_nr,klass,quality,email,phone&or=(' + ors.map(encodeURIComponent).join(',') + ')&limit=1');
+  return { handle, drive, logLine, saveUi, UUID, hvLookup };
 })();
 async function api(path, opts){ const o = opts || {}; return REMOTE.handle(o.method || 'GET', path, o.body); }
 function logTo(st, who, txt){
@@ -3938,6 +3939,80 @@ function toggleSent(id){
   saveRfqs(); lockRequest(); renderResults(); renderReqBar(); renderStepper();
 }
 $('#resTable').addEventListener('click', e => { const b = e.target.closest('[data-sent]'); if (b) toggleSent(+b.dataset.sent); });
+// Takes a supplier off the RFQ list (only while it is not marked sent).
+function removeDraft(id){
+  const q = S.rfq[id]; if (!q || q.sentMark) return false;
+  delete S.rfq[id];
+  if (S.rfqView === id) S.rfqView = null;
+  S.sent = Object.keys(S.rfq).length > 0;
+  saveRfqs(); log('pm','Tog bort '+((byId(id) || {}).name || 'leverantör '+id)+' från RFQ-listan');
+  renderReqBar(); renderStepper();
+  return true;
+}
+$('#rfqTable').addEventListener('click', e => {
+  const b = e.target.closest('[data-unrfq]'); if (!b) return;
+  const id = +b.dataset.unrfq; S.sel.delete(id);
+  if (removeDraft(id)) { toast('Borttagen från RFQ-listan'); renderRfq(); }
+});
+
+// "+ Lägg till manuellt": a supplier the search did not find. Checked against the list and HV - Databas.
+const RFQ_LANG_OPTS = ['sv','no','da','fi','de','en','nl','fr','es','pt','it','pl','sk'];
+function openManualSupplier(){
+  if (!S.sourced) { toast('Gör sökningen först – manuella leverantörer läggs till i resultatlistan'); return; }
+  if (!canSend()) { toast(sendBlockMsg()); return; }
+  const r = req();
+  openModal('<div class="modal-head"><div class="eyebrow">Lägg till leverantör</div><h3>Leverantör som sökningen inte hittade</h3></div>'+
+    '<form class="modal-body" id="manForm" novalidate><div class="grid">'+
+      '<div class="field full"><label for="man_name">Namn eller företag *</label><input id="man_name" type="text" autocomplete="off"></div>'+
+      '<div class="field"><label for="man_email">E-post</label><input id="man_email" type="email" autocomplete="off"></div>'+
+      '<div class="field"><label for="man_phone">Telefon</label><input id="man_phone" type="tel" autocomplete="off"></div>'+
+      '<div class="field"><label for="man_web">Webbplats</label><input id="man_web" type="text" placeholder="t.ex. exempel.se" autocomplete="off"></div>'+
+      '<div class="field"><label for="man_city">Ort</label><input id="man_city" type="text" value="'+esc(r.city || '')+'"></div>'+
+      '<div class="field"><label for="man_s">Supplytyp *</label><select id="man_s"><option value="">Välj …</option>'+['S1','S2','S3','S4','S5','S6','S7','MI'].map(o => '<option value="'+o+'">'+(o === 'MI' ? 'Mellanhand (kanal)' : o+' · '+STYPE[o])+'</option>').join('')+'</select></div>'+
+      '<div class="field"><label for="man_lang">Språk i RFQ</label><select id="man_lang"><option value="">Automatiskt (land, e-post)</option>'+RFQ_LANG_OPTS.map(c => '<option value="'+c+'">'+esc(RFQ_I18N[c].name)+'</option>').join('')+'</select></div>'+
+      '<div class="field full"><label for="man_note">Anteckning</label><input id="man_note" type="text" placeholder="t.ex. tips från kollega, 3 lägenheter i centrum"></div>'+
+    '</div><p class="login-err" id="manErr" hidden></p></form>'+
+    '<div class="modal-foot"><button type="button" class="btn-ghost" data-close>Avbryt</button><button type="button" class="btn" id="btnManSave">Lägg till i listan</button></div>');
+  $('#modal [data-close]').addEventListener('click', closeModal);
+  $('#btnManSave').addEventListener('click', saveManualSupplier);
+  $('#manForm').addEventListener('submit', e => { e.preventDefault(); saveManualSupplier(); });
+  setTimeout(() => $('#man_name').focus(), 50);
+}
+const hostOfWeb = u => { const s = String(u || '').trim(); if (!s) return ''; try { return new URL(/^https?:\/\//i.test(s) ? s : 'https://' + s).hostname.replace(/^www\./, '').toLowerCase(); } catch (e) { return ''; } };
+const phoneDigits = p => { const d = String(p || '').replace(/\D/g, ''); return d.length >= 7 ? d.slice(-9) : ''; };
+async function saveManualSupplier(){
+  const v = id => $('#'+id).value.trim(), err = $('#manErr');
+  const name = v('man_name'), email = v('man_email').toLowerCase(), phone = v('man_phone'), web = hostOfWeb(v('man_web')), s = v('man_s'), lang = v('man_lang'), note = v('man_note'), city = v('man_city');
+  const fail = m => { err.textContent = m; err.hidden = false; };
+  if (!name) return fail('Fyll i namn eller företag.');
+  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return fail('E-postadressen ser inte rätt ut.');
+  if (!s) return fail('Välj supplytyp.');
+  const dup = SUP.find(x => (email && String(x.email || '').toLowerCase() === email) || (phone && phoneDigits(x.phone) && phoneDigits(x.phone) === phoneDigits(phone)) || (web && hostOfWeb(x.web || x.url) === web));
+  if (dup) return fail('Finns redan i listan: '+dup.id+'. '+dup.name+'.');
+  const b = $('#btnManSave'); b.disabled = true; b.textContent = 'Lägger till …';
+  // known in HV - Databas? then its class and note apply, as for the search
+  let hv = null;
+  try {
+    const ors = [email ? 'email.eq.'+email : '', phoneDigits(phone) ? 'phone_key.eq.'+phoneDigits(phone) : '', web ? 'domain.eq.'+web : ''].filter(Boolean);
+    if (ors.length) hv = (await REMOTE.hvLookup(ors))[0] || null;
+  } catch (e) { /* the list works without the database */ }
+  const ds = DATASETS[CUR], ui = ds.rec.ui || {}, list = (ui.manualSup || []).slice();
+  const id = Math.max(1000, ...SUP.map(x => x.id)) + 1;
+  const row = { id, name, obj:(city ? city + ' · ' : '') + (note || 'Manuellt tillagd'), s:(hv && hv.klass) || s, conf:100, ch:'Manuellt', furn:'—', cap:'—', twin:'—',
+    price:'Inget pris angivet', priceSrc:'Manuellt tillagd', email:email || (hv && hv.email) || null, phone:phone || (hv && hv.phone) || '', tier:'A', srcLabel:'Manuellt tillagd',
+    url:web, web, rec:false, why:'Tillagd manuellt av '+me().name+' '+new Date().toLocaleDateString('sv-SE')+'.'+(note ? ' '+note : '')+(hv && hv.klass && hv.klass !== s ? ' Klassning från HV-Databasen: '+hv.klass+' (angivet: '+s+').' : ''),
+    stmt:'', flags:[['i','Manuellt tillagd']], lang:lang, langSet:!!lang, greet:'', manualAdded:true };
+  if (hv) { row.existing = true; row.prev = 'Finns i HV-Databasen' + (hv.objekt_nr ? ' · ' + hv.objekt_nr : '') + (hv.quality === 'Föredragen HV' ? ' · Föredragen HV' : ''); row.flags.unshift(['ok','Finns i HV-Databasen']); if (hv.quality === 'Problematisk') row.flags.unshift(['e','Problematisk enligt HV-Databasen']); }
+  if (!row.email) row.manual = row.phone ? 'Bara telefon · ' + row.phone : web ? 'Kontakt via webbplatsen' : 'Ingen kontaktuppgift';
+  list.push(row);
+  ds.rec.ui = Object.assign({}, ui, { manualSup:list });
+  SUP.push(row); SHORT[id] = name.slice(0, 24); ds.SHORT = SHORT;
+  S.sel.add(id);
+  REMOTE.saveUi(CUR, ds.rec.ui);
+  log('pm','Lade till leverantör manuellt: '+name+(hv ? ' (finns i HV-Databasen)' : ''));
+  closeModal(); renderResults();
+  toast(name+' är tillagd och vald'+(hv ? ' – finns i HV-Databasen' : ''));
+}
 let AUTOSAVE_T = null, CHOICES_T = null;
 function scheduleAutosave(){
   if (!(DS && DS.semi && CUR)) return;
@@ -3973,7 +4048,7 @@ function semiDataset(rec){
   return { mode:'live', semi:true, rec, REQ_TEXT:rec.reqText || '', PARSED:{}, REF:rec.ref,
     fillLabel:'Simulera från publicerat pris', reqLabel:'Kundens förfrågan – klistra in mejlet eller skriv fritt', title, text,
     banner:'Tolkningen och sökningen körs på Nordictas server. En sökning kostar ca $2–3 (tak $4). Inget mejl skickas från verktyget.',
-    Q_EN: R ? R.qLocal : [], Q_SK: R ? R.qEn : [], SUP: R ? R.sup : [], SHORT: R ? R.short : {},
+    Q_EN: R ? R.qLocal : [], Q_SK: R ? R.qEn : [], SUP: R ? R.sup.concat((rec.ui && rec.ui.manualSup) || []) : [], SHORT: R ? Object.assign({}, R.short, Object.fromEntries(((rec.ui && rec.ui.manualSup) || []).map(x => [x.id, String(x.name).slice(0, 24)]))) : {},
     runSteps: () => R ? R.steps : [], defaultSel: R ? R.sup.filter(x => x.rec).map(x => x.id) : [], portalPref: R ? R.portalPref : null,
     fetched: R ? R.fetched : '', runDate: R ? R.runDate : new Date().toISOString().slice(0, 10),
     qLabels: ['Sökfrågor · ' + (R ? R.localLangName : 'lokalt språk'), 'Sökfrågor · engelska'],
@@ -4031,6 +4106,7 @@ async function semiSaveRequest(markSaved){
   st.fields = fields;
   try {
     const rec = await api('/api/requests/'+id, { method:'PUT', body:{ fields, reqText:$('#reqText').value, saved:!!markSaved } });
+    if (DATASETS[id].rec && DATASETS[id].rec.ui) rec.ui = DATASETS[id].rec.ui;
     DATASETS[id].rec = rec; updateReqMeta(id); if (CUR === id) renderHeroForApp();
   } catch (e) { toast('Kunde inte spara förfrågan: '+e.message); }
 }
