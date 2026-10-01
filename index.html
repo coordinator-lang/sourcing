@@ -970,7 +970,7 @@ footer { background:var(--purple); color:rgba(255,255,255,.6); padding:48px 48px
     </div>
     <div class="toolbar">
       <div class="sum" id="resSum"></div>
-      <button class="btn-ghost" id="btnRec" type="button">Välj rekommenderade</button>
+      <button class="btn-ghost" id="btnRec" type="button">Välj alla med e-post</button>
       <button class="btn-ghost" id="btnNone" type="button">Avmarkera alla</button>
       <button class="btn-ghost" id="btnAddManual" type="button">+ Lägg till manuellt</button>
     </div>
@@ -1244,7 +1244,7 @@ footer { background:var(--purple); color:rgba(255,255,255,.6); padding:48px 48px
   </div>
   <div class="footer-bottom">
     <span>© Nordicta 2026</span>
-    <span>Nordicta Sourcing · app 0.8.0</span>
+    <span>Nordicta Sourcing · app 0.8.1</span>
   </div>
 </footer>
 
@@ -1924,8 +1924,21 @@ $('#typeChips').addEventListener('click', e => {
   ids.forEach(id => allOn ? S.sel.delete(id) : S.sel.add(id));
   renderResults();
 });
-$('#btnRec').addEventListener('click', () => { S.sel = new Set(SUP.filter(s => s.rec && contactable(s) && !S.excluded.has(s.id)).map(s => s.id)); renderResults(); const ids = [...S.sel].filter(id => !S.rfq[id] && !S.manual[id]).sort((a,b) => a-b); toast(ids.length ? 'Rekommenderade valda: '+ids.join(', ') : 'Alla rekommenderade är redan kontaktade'); });
-$('#btnNone').addEventListener('click', () => { S.sel.clear(); renderResults(); });
+$('#btnRec').addEventListener('click', () => {
+  const withEmail = SUP.filter(s => s.email && contactable(s) && !S.excluded.has(s.id)).map(s => s.id);
+  const drafts = Object.keys(S.rfq).map(Number);
+  S.sel = new Set(withEmail.concat(drafts)); renderResults();
+  const fresh = withEmail.filter(id => !S.rfq[id]).length, noEmail = SUP.filter(s => !s.email && !S.excluded.has(s.id) && !S.rfq[s.id]).length;
+  toast(withEmail.length ? (fresh ? 'Valde ' + fresh + ' med e-post' : 'Alla med e-post har redan RFQ-text') + (noEmail ? ' · ' + noEmail + ' utan e-post lämnas ' + (noEmail === 1 ? 'omarkerad' : 'omarkerade') : '') : 'Ingen leverantör har e-post – lägg till adresser manuellt');
+});
+$('#btnNone').addEventListener('click', () => {
+  const drafts = Object.keys(S.rfq).map(Number).filter(id => !S.rfq[id].sentMark), sentN = Object.keys(S.rfq).length - drafts.length;
+  S.sel.clear(); S.manual = {};
+  drafts.forEach(id => { delete S.rfq[id]; if (S.rfqView === id) S.rfqView = null; });
+  if (drafts.length) { S.sent = Object.keys(S.rfq).length > 0; saveRfqs(); log('pm', 'Avmarkerade alla och tog bort ' + drafts.length + ' från RFQ-listan'); renderReqBar(); renderStepper(); }
+  renderResults();
+  toast('Alla avmarkerade' + (drafts.length ? ' · ' + drafts.length + ' borttagna från RFQ-listan' : '') + (sentN ? ' · ' + sentN + (sentN === 1 ? ' markerad som skickad ligger' : ' markerade som skickade ligger') + ' kvar' : ''));
+});
 $('#btnAddManual').addEventListener('click', () => openManualSupplier());
 
 function openSendModal(target){
