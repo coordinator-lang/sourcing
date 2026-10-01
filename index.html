@@ -965,7 +965,7 @@ footer { background:var(--purple-fill); color:rgba(255,255,255,.6); padding:48px
         <div class="reveal-block attached three">
           <div class="field"><label for="f_customer">Kund <span class="ftag int">Internt</span></label><input id="f_customer" type="text" placeholder="—"/></div>
           <div class="field"><label for="f_project">Projekt <span class="ftag int">Internt</span></label><input id="f_project" type="text" placeholder="—"/></div>
-          <div class="field"><label for="f_budget">Budget per rum/mån <span class="ftag int">Internt</span></label><div class="amount-wrap"><input id="f_budget" type="number" min="0" placeholder="—"/><span class="amount-cur">EUR</span></div></div>
+          <div class="field"><label for="f_budget">Budget per person/mån <span class="ftag int">Internt</span></label><div class="amount-wrap"><input id="f_budget" type="number" min="0" placeholder="—"/><span class="amount-cur">EUR</span></div></div>
           <div class="field"><label for="f_work">Exakt arbetsplats <span class="ftag int">Internt</span></label><input id="f_work" type="text" placeholder="—"/></div>
           <div class="field"><label for="f_contact">Kundkontakt <span class="ftag int">Internt</span></label><input id="f_contact" type="text" placeholder="—"/></div>
           <div class="field"><label for="f_notes">Interna anteckningar <span class="ftag int">Internt</span></label><input id="f_notes" type="text" placeholder="—"/></div>
@@ -1336,7 +1336,7 @@ footer { background:var(--purple-fill); color:rgba(255,255,255,.6); padding:48px
   </div>
   <div class="footer-bottom">
     <span>© Nordicta 2026</span>
-    <span>Nordicta Sourcing · app 0.9.1</span>
+    <span>Nordicta Sourcing · app 0.9.2</span>
   </div>
 </footer>
 
@@ -1656,11 +1656,12 @@ function req(){
   const r = { country:v('f_country'), city:v('f_city'), area:v('f_area'), start:v('f_start'), end:v('f_end'),
     persons:Math.max(0, n('f_persons')), ppr:Math.max(1, Math.round(n('f_ppr')) || 2), twin:v('f_twin'), furn:v('f_furn'), kitchen:v('f_kitchen'),
     wifi:v('f_wifi'), parking:n('f_parking'), dish:v('f_dish'), laundry:v('f_laundry'), customer:v('f_customer'), project:v('f_project'),
-    budget:n('f_budget'), work:v('f_work'), contact:v('f_contact'), notes:v('f_notes') };
+    budgetPerson:n('f_budget'), work:v('f_work'), contact:v('f_contact'), notes:v('f_notes') };
   r.valid = !!(r.start && r.end && D(r.end) > D(r.start) && r.persons > 0);
   r.nights = r.valid ? nightsBetween(r.start, r.end) : 0;
   r.months = r.valid ? Math.round(calMonths(r.start, r.end) * 100) / 100 : 0;
   r.rooms = r.persons ? Math.ceil(r.persons / r.ppr) : 0;
+  r.budget = r.budgetPerson * r.ppr;   // per room and month – what the price comparisons use
   return r;
 }
 
@@ -1780,7 +1781,7 @@ function go(n){
 /* ---------- STEP 1 ---------- */
 function renderCalc(){
   const r = req(), box = $('#calcStats');
-  const labels = ['Längd','Rum som behövs','Kundbudget per rum/mån','Max inköp per rum/mån','Max inköp per person/natt','Max kontraktsvärde'];
+  const labels = ['Längd','Rum som behövs','Kundbudget per person/mån','Max inköp per person/mån','Max inköp per person/natt','Max kontraktsvärde'];
   if (!r.valid) {
     box.innerHTML = labels.map(k => '<div class="stat"><div class="k">'+k+'</div><div class="v">—</div><div class="s">väntar på datum och antal</div></div>').join('');
     return;
@@ -1790,10 +1791,10 @@ function renderCalc(){
   box.innerHTML =
     st('Längd', r.nights+' nätter', fmt(r.months,1)+' kalendermånader') +
     st('Rum som behövs', r.rooms, r.persons+' personer · '+r.ppr+' per rum') +
-    st('Kundbudget per rum/mån', r.budget ? eur(r.budget) : '—', 'det kunden kan betala', true) +
-    st('Max inköp per rum/mån', r.budget ? eur(maxBuy) : '—', 'för minst 15 % TB', true) +
-    st('Max inköp per person/natt', r.budget ? eur(maxBuy * r.months / r.nights / r.ppr, 2) : '—', 'max inköp × månader ÷ nätter ÷ '+r.ppr, true) +
-    st('Max kontraktsvärde', r.budget ? eur(r.budget * r.months * r.rooms) : '—', 'kundbudget × '+r.rooms+' rum × '+fmt(r.months,1)+' mån', true);
+    st('Kundbudget per person/mån', r.budgetPerson ? eur(r.budgetPerson) : '—', 'det kunden kan betala'+(r.budgetPerson && r.ppr > 1 ? ' · '+eur(r.budget)+' per rum' : ''), true) +
+    st('Max inköp per person/mån', r.budgetPerson ? eur(r.budgetPerson * (1 - TB_MIN)) : '—', 'för minst 15 % TB'+(r.budgetPerson && r.ppr > 1 ? ' · '+eur(maxBuy)+' per rum' : ''), true) +
+    st('Max inköp per person/natt', r.budgetPerson ? eur(r.budgetPerson * (1 - TB_MIN) * r.months / r.nights, 2) : '—', 'max inköp × månader ÷ nätter', true) +
+    st('Max kontraktsvärde', r.budgetPerson ? eur(r.budgetPerson * r.months * r.persons) : '—', 'kundbudget × '+r.persons+' personer × '+fmt(r.months,1)+' mån', true);
 }
 function lockRequest(){
   const locked = Object.values(S.rfq || {}).some(q => q.sentMark);
@@ -2514,7 +2515,7 @@ function renderRfq(){
     '</div>';
   const r = req();
   $('#ckIn').innerHTML = supplierFacing().map(x => '<li><span class="i-ok">'+IC.check+'</span><span>'+esc(x[0])+': <span class="val">'+esc(x[1])+'</span></span></li>').join('');
-  const out = [['Kund', r.customer], ['Projekt', r.project], ['Budget', r.budget ? eur(r.budget)+'/rum/mån' : ''], ['Exakt arbetsplats', r.work], ['Kundkontakt', r.contact], ['Interna anteckningar', r.notes]].filter(x => x[1]);
+  const out = [['Kund', r.customer], ['Projekt', r.project], ['Budget', r.budgetPerson ? eur(r.budgetPerson)+'/person/mån' : ''], ['Exakt arbetsplats', r.work], ['Kundkontakt', r.contact], ['Interna anteckningar', r.notes]].filter(x => x[1]);
   $('#ckOut').innerHTML = out.map(x => '<li><span class="i-lock">'+IC.lock+'</span><span>'+esc(x[0])+': <span class="val">'+esc(x[1])+'</span></span></li>').join('') +
     '<li class="small muted" style="margin-top:6px">Den AI som skrev mejlet fick bara de leverantörssynliga fälten.</li>';
   let h = '<thead><tr><th>#</th><th>Leverantör</th><th>Typ</th><th>Referens</th><th>Språk</th><th>Status</th><th></th></tr></thead><tbody>';
@@ -4134,7 +4135,10 @@ const REMOTE = (() => {
       f_wifi:TXT[row.wifi] || '', f_parking:row.parking_spaces ? String(row.parking_spaces) : '',
       f_dish:TXT[row.dishwasher] || '', f_laundry:LAUNDRY_TXT[row.laundry] || '',
       f_customer:str(p.customer_name), f_project:str(p.project), f_contact:str(p.contact_person), f_work:str(p.workplace),
-      f_budget:p.budget_eur_room_month != null ? String(Math.round(p.budget_eur_room_month)) : '', f_notes:str(p.notes) };
+      // 0.9.2: the budget is per person and month (older rows only had it per room: ÷ persons per room)
+      f_budget:p.budget_eur_person_month != null ? String(Math.round(p.budget_eur_person_month))
+        : p.budget_eur_room_month != null ? String(Math.round(p.budget_eur_room_month / Math.max(1, row.persons_per_room || 1))) : '',
+      f_notes:str(p.notes) };
   }
   function fromFields(f){
     let a = iso(f.f_start), b = iso(f.f_end); if (a && b && b <= a) b = null;
@@ -4144,7 +4148,8 @@ const REMOTE = (() => {
         persons:persons > 0 ? persons : null, persons_per_room:ppr >= 1 && ppr <= 4 ? ppr : null,
         twin:code(f.f_twin), furnished:code(f.f_furn), kitchen:code(f.f_kitchen), wifi:code(f.f_wifi), dishwasher:code(f.f_dish), laundry:LAUNDRY_CODE[f.f_laundry] || null, parking_spaces:int(f.f_parking) || 0 },
       priv:{ customer_name:f.f_customer || null, project:f.f_project || null, contact_person:f.f_contact || null, workplace:f.f_work || null,
-        budget_eur_room_month:budget > 0 ? budget : null, notes:f.f_notes || null } };
+        budget_eur_person_month:budget > 0 ? budget : null,
+        budget_eur_room_month:budget > 0 ? Math.round(budget * Math.max(1, ppr || 1) * 100) / 100 : null, notes:f.f_notes || null } };
   }
   const WHO_OF = { person:'pm', ai:'ai', system:'sys', leverantor:'sup' }, ACTOR_OF = { pm:'person', ai:'ai', sys:'system', sup:'leverantor' };
   const hm = d => String(d.getHours()).padStart(2, '0')+':'+String(d.getMinutes()).padStart(2, '0');
