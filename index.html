@@ -277,7 +277,7 @@ a.ext { color:var(--purple); font-weight:600; text-decoration:none; border-botto
 a.ext:hover { color:var(--gold-ink); border-bottom-color:var(--gold); }
 .ssub { font-size:12px; color:var(--muted); margin-top:2px; }
 .ssub.ok { color:var(--ok); font-weight:600; }
-.rank { font-weight:700; color:var(--muted); }
+.rank { font-weight:700; color:var(--muted); white-space:nowrap; min-width:30px; }
 .why-row td { background:var(--bg) !important; }
 .why { display:grid; grid-template-columns:1.2fr 1.2fr .8fr; gap:22px; padding:6px 4px; }
 .why p { font-size:13.5px; line-height:1.6; }
@@ -1160,7 +1160,7 @@ footer { background:var(--purple); color:rgba(255,255,255,.6); padding:48px 48px
   </div>
   <div class="footer-bottom">
     <span>© Nordicta 2026</span>
-    <span>Nordicta Sourcing · app 0.6.0</span>
+    <span>Nordicta Sourcing · app 0.6.1</span>
   </div>
 </footer>
 
@@ -1748,7 +1748,7 @@ function renderResults(){
     h += '<tr class="'+(sel && !exc ? 'sel' : '')+(exc ? ' off' : '')+'">'+
       (S.rfq[s.id] && S.rfq[s.id].sentMark ? '<td><span class="sent-tick" title="RFQ skickad '+esc(S.rfq[s.id].sentMark.at)+'" aria-label="RFQ skickad">'+IC.check+'</span></td>'
         : '<td><label class="cb'+(dis?' disabled':'')+'" title="'+(!contactable(s)?(s.noReason || 'Kan inte kontaktas utanför plattformen'):done?'RFQ-text skapad. Ta bort krysset för att ta bort leverantören från RFQ-listan.':'')+'"><input type="checkbox" data-sel="'+s.id+'"'+((sel || S.rfq[s.id]) && !exc ? ' checked' : '')+(dis?' disabled':'')+'><span class="cbx"></span></label></td>')+
-      '<td class="rank">'+s.id+'</td>'+
+      '<td class="rank">'+supNo(s)+'</td>'+
       '<td class="c-name"><div class="sname">'+esc(s.name)+'</div><div class="ssub">'+esc(s.obj)+'</div>'+(s.existing?'<div class="ssub ok">★ '+esc(s.prev)+'</div>':'')+(s.known?'<div class="ssub" style="color:var(--gold-ink)">↺ '+esc(s.known)+'</div>':'')+'<button type="button" class="linkbtn" data-why="'+s.id+'">'+(S.openWhy.has(s.id)?'Dölj':'Varför?')+'</button></td>'+
       '<td class="c-type">'+sb(c)+'<div class="ssub">'+esc(STYPE[c])+'</div>'+(S.classOverride[s.id]?'<div class="ssub" style="color:var(--gold-ink)">ändrad av PM</div>':'')+'<div style="margin-top:7px">'+confBar(s.conf)+'</div></td>'+
       '<td class="c-cap">'+esc(s.cap)+'<div class="ssub">'+esc(s.furn)+'</div></td>'+
@@ -1916,7 +1916,7 @@ function fmtOf(s){ const q = S.rfq[s.id]; if (q && q.format) return q.format; S.
 // Replies are matched on the plus address (see app/_shared/match.ts): NDT-PO-2026-00451-R02 → sourcing+2026-00451-R02@nordicta.com
 const tagAddr = ref => 'sourcing+'+String(ref).replace(/^NDT-PO-/, '')+'@nordicta.com';
 function rfqDraft(s){
-  const ref = REF+'-R'+String(s.id).padStart(2,'0');
+  const ref = REF+'-'+(s.manualAdded ? 'M'+String(s.id - 1000).padStart(2,'0') : 'R'+String(s.id).padStart(2,'0'));
   return { ref, format:fmtOf(s), fromName:me().name, fromAddr:senderAddr(), replyTo:replyTo().replace('sourcing@nordicta.com', tagAddr(ref)), lang:me().lang, sig:{ name:me().name, title:me().title, phone:me().phone } };
 }
 function supplierFacing(){
@@ -2216,7 +2216,7 @@ function makeDrafts(){
   const L = sendList(), list = L.email.concat(L.manual);
   if (!list.length) { toast('Välj minst en leverantör i listan först'); return; }
   list.forEach(sp => { S.rfq[sp.id] = textDraft(sp); });
-  log('pm','Skapade RFQ-text för '+list.length+' leverantör'+(list.length > 1 ? 'er' : '')+' ('+list.map(sp => sp.id).join(', ')+'). Mejlen kopieras och skickas från egen Outlook.');
+  log('pm','Skapade RFQ-text för '+list.length+' leverantör'+(list.length > 1 ? 'er' : '')+' ('+list.map(supNo).join(', ')+'). Mejlen kopieras och skickas från egen Outlook.');
   S.sent = true;
   if (!S.rfqView || !S.rfq[S.rfqView]) S.rfqView = list[0].id;
   saveRfqs();
@@ -2284,7 +2284,7 @@ function renderRfq(){
     return;
   }
   if (!S.rfq[S.rfqView]) S.rfqView = ids[0];
-  $('#mailTabs').innerHTML = ids.map(id => '<button type="button" class="chip'+(id === S.rfqView ? ' on' : '')+'" data-mt="'+id+'">'+(S.rfq[id].sentMark ? '✓ ' : '')+id+'. '+esc(shortName(id))+'</button>').join('');
+  $('#mailTabs').innerHTML = ids.map(id => '<button type="button" class="chip'+(id === S.rfqView ? ' on' : '')+'" data-mt="'+id+'">'+(S.rfq[id].sentMark ? '✓ ' : '')+supNo(byId(id))+'. '+esc(shortName(id))+'</button>').join('');
   const sp = byId(S.rfqView), q = S.rfq[S.rfqView], L = RFQ_I18N[rfqLang(sp)];
   $('#mailView').innerHTML =
     '<div class="mail-head">'+
@@ -2306,7 +2306,7 @@ function renderRfq(){
   let h = '<thead><tr><th>#</th><th>Leverantör</th><th>Typ</th><th>Referens</th><th>Språk</th><th>Status</th><th></th></tr></thead><tbody>';
   ids.forEach(id => {
     const s2 = byId(id), q2 = S.rfq[id];
-    h += '<tr'+(id === S.rfqView ? ' class="sel"' : '')+'><td class="rank">'+id+'</td><td><div class="sname">'+esc(s2.name)+'</div><div class="ssub">'+esc(s2.email || s2.manual || '')+'</div></td><td>'+sb(cls(s2))+'</td><td>'+q2.ref+'</td>'+
+    h += '<tr'+(id === S.rfqView ? ' class="sel"' : '')+'><td class="rank">'+supNo(s2)+'</td><td><div class="sname">'+esc(s2.name)+'</div><div class="ssub">'+esc(s2.email || s2.manual || '')+'</div></td><td>'+sb(cls(s2))+'</td><td>'+q2.ref+'</td>'+
       '<td class="small">'+esc(RFQ_I18N[rfqLang(s2)].name)+'</td>'+
       '<td>'+(q2.sentMark ? '<span class="status-dot ok">Skickad</span><div class="ssub">'+esc(q2.sentMark.at)+'</div>' : '<span class="status-dot open">Att skicka</span>')+'</td>'+
       '<td style="white-space:nowrap"><button type="button" class="linkbtn" data-show="'+id+'">Visa text</button>'+(q2.sentMark ? '' : ' · <button type="button" class="linkbtn" data-unrfq="'+id+'">Ta bort</button>')+'</td></tr>';
@@ -3988,7 +3988,7 @@ async function saveManualSupplier(){
   if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return fail('E-postadressen ser inte rätt ut.');
   if (!s) return fail('Välj supplytyp.');
   const dup = SUP.find(x => (email && String(x.email || '').toLowerCase() === email) || (phone && phoneDigits(x.phone) && phoneDigits(x.phone) === phoneDigits(phone)) || (web && hostOfWeb(x.web || x.url) === web));
-  if (dup) return fail('Finns redan i listan: '+dup.id+'. '+dup.name+'.');
+  if (dup) return fail('Finns redan i listan: '+supNo(dup)+'. '+dup.name+'.');
   const b = $('#btnManSave'); b.disabled = true; b.textContent = 'Lägger till …';
   // known in HV - Databas? then its class and note apply, as for the search
   let hv = null;
@@ -4013,6 +4013,8 @@ async function saveManualSupplier(){
   closeModal(); renderResults();
   toast(name+' är tillagd och vald'+(hv ? ' – finns i HV-Databasen' : ''));
 }
+// The number shown for a supplier: search rows 1, 2, 3 …; manually added rows M1, M2 …
+function supNo(s){ return !s ? '' : s.manualAdded ? 'M' + (s.id - 1000) : String(s.id); }
 let AUTOSAVE_T = null, CHOICES_T = null;
 function scheduleAutosave(){
   if (!(DS && DS.semi && CUR)) return;
