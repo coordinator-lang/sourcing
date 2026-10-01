@@ -734,6 +734,21 @@ footer { background:var(--purple); color:rgba(255,255,255,.6); padding:48px 48px
   .flag { font-size:11px; }
 }
 @media (min-width:981px){ #structFields .f-laundry { grid-column:span 2; } }
+/* ===== app 0.9: Market Intelligence ===== */
+.mi-list { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; }
+.mi-list > li { padding:12px 0; border-bottom:1px solid var(--line); font-size:14px; line-height:1.55; }
+.mi-list > li:last-child { border-bottom:0; }
+.mi-head { display:flex; flex-wrap:wrap; align-items:center; gap:6px 10px; }
+.mi-head .rank { font-weight:700; color:var(--muted); min-width:22px; }
+.mi-head .mi-st, .mi-head .mi-price { margin-left:auto; }
+.mi-price { font-weight:700; white-space:nowrap; }
+.mi-why { margin-top:6px; }
+.mi-quote { margin-top:6px; padding-left:10px; border-left:3px solid var(--line); color:var(--muted); font-style:italic; font-size:13px; }
+.mi-sub { color:var(--muted); font-size:12.5px; margin-top:4px; overflow-wrap:anywhere; }
+.mi-h4 { font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); margin:18px 0 4px; }
+.runlog li.mi-cost { color:var(--gold-ink); font-size:12.5px; font-weight:600; padding-left:31px; }
+.alog li { grid-template-columns:minmax(48px, max-content) 1fr; }
+.alog .t { white-space:nowrap; }
 </style>
 </head>
 <body>
@@ -866,7 +881,7 @@ footer { background:var(--purple); color:rgba(255,255,255,.6); padding:48px 48px
   <!-- STEP 1 · REQUEST -->
   <section class="step-view" data-step="1">
     <div class="view-head">
-      <div class="eyebrow">Steg 1 av 4</div>
+      <div class="eyebrow">Steg 1 av 5</div>
       <h2 class="view-title">Ny kundförfrågan</h2>
       <p class="view-lead">Klistra in kundens mejl. AI gör om det till strukturerade fält. Det som får visas för leverantörer hålls isär från interna uppgifter som kund, projekt och budget.</p>
     </div>
@@ -932,7 +947,7 @@ footer { background:var(--purple); color:rgba(255,255,255,.6); padding:48px 48px
   <!-- STEP 2 · AI SOURCING -->
   <section class="step-view" data-step="2">
     <div class="view-head">
-      <div class="eyebrow">Steg 2 av 4</div>
+      <div class="eyebrow">Steg 2 av 5</div>
       <h2 class="view-title">AI-sourcing</h2>
       <p class="view-lead">AI söker på webben, på lokalt språk och på engelska, och jämför träffarna med HV-Databasen. Sökningen tar ca 5 minuter. Låt sidan vara öppen tills den är klar – stängs den fortsätter sökningen nästa gång någon i teamet öppnar verktyget.</p>
     </div>
@@ -964,7 +979,7 @@ footer { background:var(--purple); color:rgba(255,255,255,.6); padding:48px 48px
   <!-- STEP 3 · REVIEW & SELECT -->
   <section class="step-view" data-step="3">
     <div class="view-head">
-      <div class="eyebrow">Steg 3 av 4</div>
+      <div class="eyebrow">Steg 3 av 5</div>
       <h2 class="view-title">Granska och välj leverantörer</h2>
       <p class="view-lead">Du bestämmer vem som får RFQ-texten. Verktyget kontaktar ingen själv. Klicka på ”Varför?” för att se klassningen, källan och utdraget den bygger på.</p>
     </div>
@@ -986,7 +1001,7 @@ footer { background:var(--purple); color:rgba(255,255,255,.6); padding:48px 48px
   <!-- STEP 4 · RFQ -->
   <section class="step-view" data-step="4">
     <div class="view-head">
-      <div class="eyebrow">Steg 4 av 4</div>
+      <div class="eyebrow">Steg 4 av 5</div>
       <h2 class="view-title">RFQ att kopiera</h2>
       <p class="view-lead">Verktyget skickar ingenting själv. Kopiera texten, klistra in den i ett nytt mejl i din egen Outlook, där din vanliga signatur läggs till, och skicka. Markera sedan leverantören som skickad, så får den en bock i steg 3.</p>
     </div>
@@ -1030,7 +1045,7 @@ footer { background:var(--purple); color:rgba(255,255,255,.6); padding:48px 48px
   </section>
 
   <!-- STEP 5 · SUPPLIER PORTAL -->
-  <section class="step-view" data-step="5">
+  <section class="step-view" data-step="demo5">
     <div class="view-head">
       <div class="eyebrow">Steg 5 av 7</div>
       <h2 class="view-title">Leverantörens svar</h2>
@@ -1154,7 +1169,7 @@ footer { background:var(--purple); color:rgba(255,255,255,.6); padding:48px 48px
   </section>
 
   <!-- STEP 6 · COMPARE -->
-  <section class="step-view" data-step="6">
+  <section class="step-view" data-step="demo6">
     <div class="view-head">
       <div class="eyebrow">Steg 6 av 7</div>
       <h2 class="view-title">Jämför offerter</h2>
@@ -1184,7 +1199,7 @@ footer { background:var(--purple); color:rgba(255,255,255,.6); padding:48px 48px
   </section>
 
   <!-- STEP 7 · MARKET INTELLIGENCE -->
-  <section class="step-view" data-step="7">
+  <section class="step-view" data-step="demo7">
     <div class="view-head">
       <div class="eyebrow">Steg 7 av 7</div>
       <h2 class="view-title">Market Intelligence och Salesforce</h2>
@@ -1217,6 +1232,43 @@ footer { background:var(--purple); color:rgba(255,255,255,.6); padding:48px 48px
       </div>
       <div class="section">
         <div class="section-header"><div class="section-num">4</div><h2>Aktivitetslogg</h2></div>
+        <ul class="alog" id="logFullDemo"></ul>
+      </div>
+    </div>
+  </section>
+  <!-- STEP 5 · MARKET INTELLIGENCE (app 0.9) -->
+  <section class="step-view" data-step="5">
+    <div class="view-head">
+      <div class="eyebrow">Steg 5 av 5</div>
+      <h2 class="view-title">Market Intelligence</h2>
+      <p class="view-lead">Vad verktyget gjorde i den här förfrågan och varför: sökningen, sidorna AI:n valde att läsa, varför varje leverantör fick sin klass, priserna som sågs och allt som har hänt.</p>
+    </div>
+    <div class="form-card">
+      <div class="section">
+        <div class="section-header"><div class="section-num">1</div><h2>Sökningen</h2></div>
+        <div class="stats" id="miStats"></div>
+        <ul class="runlog" id="miSteps" style="margin-top:18px"></ul>
+        <div class="q-group" style="margin-top:18px"><h4 id="miQLocalLabel">Sökfrågor</h4><div id="miQLocal"></div></div>
+        <div class="q-group"><h4>Sökfrågor · engelska</h4><div id="miQEn"></div></div>
+      </div>
+      <div class="section">
+        <div class="section-header"><div class="section-num">2</div><h2>Sidorna AI:n valde att läsa – och varför</h2></div>
+        <div id="miPages"></div>
+      </div>
+      <div class="section">
+        <div class="section-header"><div class="section-num">3</div><h2>Varför de här leverantörerna</h2></div>
+        <p class="section-intro">Klassen, hur säker AI:n är, motiveringen och citatet den bygger på, källan och var leverantören står i flödet nu.</p>
+        <div id="miWhy"></div>
+      </div>
+      <div class="section">
+        <div class="section-header"><div class="section-num">4</div><h2>Priser som sökningen såg</h2></div>
+        <p class="section-intro">Annonserade priser från leverantörernas egna sidor, omräknade till euro per rum och månad. Det är inte offerter. Jämförelsen tar med teamets alla sökningar; median visas först vid minst 5 priser.</p>
+        <div id="miPrices"></div>
+        <div id="miBench"></div>
+      </div>
+      <div class="section">
+        <div class="section-header"><div class="section-num">5</div><h2>Aktivitetslogg</h2></div>
+        <p class="section-intro">Allt som har gjorts i förfrågan, av vem och när. Sparas i databasen och syns för hela teamet. Namnet kommer från "Min profil".</p>
         <ul class="alog" id="logFull"></ul>
       </div>
     </div>
@@ -1244,7 +1296,7 @@ footer { background:var(--purple); color:rgba(255,255,255,.6); padding:48px 48px
   </div>
   <div class="footer-bottom">
     <span>© Nordicta 2026</span>
-    <span>Nordicta Sourcing · app 0.8.2</span>
+    <span>Nordicta Sourcing · app 0.9.0</span>
   </div>
 </footer>
 
@@ -1603,7 +1655,7 @@ $('#backdrop').addEventListener('click', () => { closeDrawer(); closeModal(); })
 document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeDrawer(); closeModal(); } });
 
 /* ---------- stepper ---------- */
-const STEPS = ['Förfrågan','AI-sourcing','Välj leverantörer','RFQ'];
+const STEPS = ['Förfrågan','AI-sourcing','Välj leverantörer','RFQ','Market Intelligence'];
 function stepDone(i){ return [S.saved, S.sourced, S.sent, S.sent && S.visited[4], S.submitted, S.simulated && S.visited[6], S.visited[7]][i-1]; }
 function renderStepper(){
   $('#stepper').innerHTML = STEPS.map((l, i) => {
@@ -1648,15 +1700,14 @@ function ensure(n){
   }
 }
 function showStep(n){
-  n = Math.min(n, 4);   // the simple version ends at the RFQ
-  if (S && S.step === 5 && n !== 5) { endVisit(); S._portalOpened = false; }
+  n = Math.min(n, 5);   // app 0.9: step 5 = Market Intelligence
   S.step = n; S.visited[n] = true;
   $$('.step-view').forEach(v => v.classList.toggle('active', +v.dataset.step === n));
   if (n === 1) lockRequest();
   if (n === 2) renderStep2();
   if (n === 3) renderResults();
   if (n === 4) renderRfq();
-  if (n === 5) { if (!S._portalOpened) openPortal(); renderPortal(); renderVisitMeter(); }
+  if (n === 5) renderMI5();
   if (n === 6) renderCompare();
   if (n === 7) renderMI();
   renderStepper(); renderReqBar();
@@ -1666,7 +1717,7 @@ function showStep(n){
   if (window.scrollY > top) window.scrollTo({ top, behavior:'smooth' });
 }
 function go(n){
-  n = Math.min(n, 4);
+  n = Math.min(n, 5);
   if (DS && DS.semi) {
     if (n >= 2 && !req().valid) { toast('Skriv in och tolka förfrågan först – ort, datum och antal personer behövs.'); n = 1; }
     else if (n >= 3 && !S.sourced) { toast(S.sourcing ? 'Sökningen pågår – resultatet visas i steg 3 när den är klar.' : 'Starta sourcingen i steg 2 först.'); n = 2; }
@@ -1676,7 +1727,7 @@ function go(n){
     if (touched || S.parsed) { toast('Förfrågan saknar giltiga datum eller antal personer. Rätta i steg 1.'); n = 1; }
   }
   // Nothing is ever sent without the PM's approval – jumping past step 3 asks for it first.
-  if (n >= 4 && !S.sent) {
+  if (n === 4 && !S.sent) {
     ensure(3); showStep(3);
     const L = sendList();
     if (L.email.length || L.manual.length) makeDrafts();
@@ -2339,7 +2390,7 @@ function makeDrafts(){
   const L = sendList(), list = L.email.concat(L.manual);
   if (!list.length) { toast('Välj minst en leverantör i listan först'); return; }
   list.forEach(sp => { S.rfq[sp.id] = textDraft(sp); });
-  log('pm','Skapade RFQ-text för '+list.length+' leverantör'+(list.length > 1 ? 'er' : '')+' ('+list.map(supNo).join(', ')+'). Mejlen kopieras och skickas från egen Outlook.');
+  log('pm','Skapade RFQ-text för '+list.length+' leverantör'+(list.length > 1 ? 'er' : '')+' ('+list.map(x => x.name).join(', ')+'). Mejlen kopieras och skickas från egen Outlook.');
   S.sent = true;
   if (!S.rfqView || !S.rfq[S.rfqView]) S.rfqView = list[0].id;
   saveRfqs();
@@ -2444,6 +2495,7 @@ $('#mailView').addEventListener('click', async e => {
     const what = c.dataset.copy, mail = what === 'body' ? rfqMail(sp) : null;
     const ok = mail ? await copyRich(mail.html, mail.text) : await copyText(what === 'to' ? sp.email : rfqSubject(sp));
     toast(!ok ? 'Kunde inte kopiera. Markera texten och kopiera med Ctrl+C.' : what === 'body' ? 'Mejltexten är kopierad. Klistra in den ovanför din signatur i Outlook.' : what === 'to' ? 'Mottagaren är kopierad' : 'Ämnesraden är kopierad');
+    if (ok && what === 'body' && !COPIED.has(CUR + ':' + sp.id)) { COPIED.add(CUR + ':' + sp.id); const lc = rfqLang(sp); log('pm', 'Kopierade RFQ-texten till ' + sp.name + ' (' + RFQ_I18N[lc].name + (lc === 'sv' || lc === 'en' ? '' : ' + engelska') + ')'); }
     if (ok && what === 'body') { const lbl = c.querySelector('span'); lbl.textContent = 'Kopierat ✓'; setTimeout(() => { if (lbl.isConnected) lbl.textContent = 'Kopiera mejltext'; }, 2200); }
     return;
   }
@@ -3591,6 +3643,86 @@ $$('[data-csv]').forEach(b => b.addEventListener('click', () => {
   renderMI();
 }));
 
+/* ---------- app 0.9: Market Intelligence (step 5) ---------- */
+const COPIED = new Set();   // "Kopierade RFQ-texten" is logged once per supplier and page visit
+const miUrl = u => String(u || '').replace(/^https?:[/][/](www[.])?/i, '').replace(/[/]$/, '');
+const miHost = u => hostOf(miUrl(u));
+function miStatus(s){
+  const q = S.rfq[s.id];
+  if (q && q.sentMark) return '<span class="status-dot ok">Skickad '+esc(q.sentMark.at)+'</span>';
+  if (q) return '<span class="status-dot open">RFQ-text skapad</span>';
+  if (S.excluded.has(s.id)) return '<span class="status-dot no">Exkluderad</span>';
+  if (S.sel.has(s.id)) return '<span class="status-dot sent">Vald</span>';
+  return '<span class="status-dot">Inte vald</span>';
+}
+function miMedian(v){ const a = v.slice().sort((x, y) => x - y), m = Math.floor(a.length / 2); return a.length % 2 ? a[m] : (a[m - 1] + a[m]) / 2; }
+function miSpan(v){ if (!v.length) return '—'; const a = v.slice().sort((x, y) => x - y); return 'n='+a.length+' · '+eur(a[0])+(a.length > 1 ? '–'+eur(a[a.length - 1]) : '')+(a.length >= 5 ? ' · median '+eur(miMedian(a)) : ''); }
+// advertised prices from every search in the team; the same supplier and price counts once
+function miAllPrices(){
+  const out = [], seen = new Set();
+  Object.keys(DATASETS).forEach(id => {
+    const ds = DATASETS[id], R = ds && ds.semi && ds.rec && ds.rec.result; if (!R || !Array.isArray(R.sup)) return;
+    const f = ds.rec.fields || {};
+    R.sup.forEach(s => {
+      if (!s.adv || !(s.adv.val > 0)) return;
+      const key = (miHost(s.web || s.url) || s.name) + '|' + Math.round(s.adv.val); if (seen.has(key)) return; seen.add(key);
+      out.push({ req:id, s:id === CUR ? cls(s) : s.s, val:s.adv.val, city:String(f.f_city || '').trim().toLowerCase(), country:String(f.f_country || '').trim().toLowerCase() });
+    });
+  });
+  return out;
+}
+function renderMI5(){
+  const R = DS && DS.rec && DS.rec.result, r = req();
+  renderLog();
+  if (!R) { $('#miStats').innerHTML = SEMI_TILE('Status', 'Ej sökt', 'starta sourcingen i steg 2'); ['#miSteps','#miQLocal','#miQEn','#miPages','#miWhy','#miPrices','#miBench'].forEach(x => { $(x).innerHTML = ''; }); return; }
+  const st = R.stats || {}, dur = st.durationS || 0, nMan = SUP.filter(s => s.manualAdded).length;
+  $('#miStats').innerHTML =
+      SEMI_TILE('Sökt', esc(String(R.fetched || '—').split(' ').slice(0, 2).join(' ')), (R.runTime ? 'kl '+esc(R.runTime)+' · ' : '')+Math.floor(dur / 60)+' min '+(dur % 60)+' s · API-kostnad $'+Number(st.cost || 0).toFixed(2))
+    + SEMI_TILE('Sökfrågor', st.queries || 0, (R.qLocal || []).length+' på '+esc(R.localLangName || 'lokalt språk')+', '+(R.qEn || []).length+' på engelska')
+    + SEMI_TILE('Sidor lästa', st.pages || 0, (st.unique || 0)+' unika träffar'+((st.blocked || []).length ? ' · '+st.blocked.length+' blockerade' : ''))
+    + SEMI_TILE('Resultat', (st.suppliers || 0)+' + '+(st.channels || 0), 'leverantörer + kanaler · '+SUP.filter(s => s.email).length+' med e-post'+(nMan ? ' · '+nMan+' tillagda manuellt' : ''))
+    + SEMI_TILE('HV-Databasen', st.hvKnown || 0, st.hvKnown ? 'kända hyresvärdar i resultatet'+(st.hvReclassed ? ', '+st.hvReclassed+' fick klassen från databasen' : '') : 'inga kända hyresvärdar i resultatet');
+  const ph = st.phases || [];
+  $('#miSteps').innerHTML = (R.steps || []).map(x => '<li><span class="ic done">'+IC.check+'</span><div><div>'+esc(x[0])+'</div><div class="sub">'+esc(x[1])+'</div></div></li>').join('')
+    + (ph.length ? '<li class="mi-cost">Kostnad per steg: '+ph.map(p => esc(p.name)+' $'+Number(p.usd || 0).toFixed(2)).join(' · ')+'</li>' : '');
+  $('#miQLocalLabel').textContent = 'Sökfrågor · '+(R.localLangName || 'lokalt språk');
+  $('#miQLocal').innerHTML = (R.qLocal || []).map(q => '<span class="q">'+esc(q)+'</span>').join('') || '<span class="muted small">—</span>';
+  $('#miQEn').innerHTML = (R.qEn || []).map(q => '<span class="q">'+esc(q)+'</span>').join('') || '<span class="muted small">—</span>';
+  const T = R.trail;
+  if (!T) $('#miPages').innerHTML = '<p class="field-helper">Listan över lästa sidor sparas för sökningar som görs från och med app 0.9 (1 okt 2026). Den här sökningen gjordes före det.</p>'
+    + ((st.blocked || []).length ? '<p class="mi-sub">Blockerade läsningen: '+esc(st.blocked.join(', '))+'</p>' : '');
+  else {
+    const gave = p => { const h = miHost(p.url); return SUP.filter(s => !s.manualAdded && (miHost(s.url) === h || miHost(s.web) === h)).map(s => s.name); };
+    $('#miPages').innerHTML = '<ol class="mi-list">' + T.picks.map((p, i) => { const g = gave(p), u = miUrl(p.url);
+        return '<li><div class="mi-head"><span class="rank">'+(i + 1)+'</span>'+(extLink(u, u.length > 60 ? u.slice(0, 57)+'…' : u) || '<b>'+esc(u)+'</b>')
+          + (p.failed ? '<span class="flag w">Kunde inte läsas</span>' : g.length ? '<span class="flag ok">Gav '+esc(g.join(', '))+'</span>' : '<span class="flag i">Ingen leverantör</span>')+'</div>'
+          + (p.reason ? '<div class="mi-sub">Varför AI:n valde sidan: '+esc(p.reason)+'</div>' : '')+'</li>'; }).join('') + '</ol>'
+      + (T.skipped && T.skipped.length ? '<h4 class="mi-h4">Marknadsplatsannonser som bara noterades (lästes inte)</h4><ul class="mi-list">' + T.skipped.map(x => '<li><div class="mi-head">'+esc(x.title || miUrl(x.url))+(x.price ? '<span class="muted">· '+esc(x.price)+'</span>' : '')+'</div><div class="mi-sub">'+(extLink(miUrl(x.url)) || esc(miUrl(x.url)))+'</div></li>').join('') + '</ul>' : '')
+      + (T.knownHits && T.knownHits.length ? '<p class="mi-sub" style="margin-top:12px">Kända hyresvärdar ur HV-Databasen som sökningen träffade, och därför inte lästes om: '+esc(T.knownHits.join(', '))+'</p>' : '');
+  }
+  $('#miWhy').innerHTML = '<ol class="mi-list">' + SUP.map(s => { const c = cls(s), ov = S.classOverride[s.id];
+      return '<li><div class="mi-head"><span class="rank">'+supNo(s)+'</span><b>'+esc(s.name)+'</b>'+sb(c)+'<span class="muted small">'+esc(STYPE[c] || '')+(s.conf != null ? ' · säkerhet '+s.conf+' %' : '')+'</span><span class="mi-st">'+miStatus(s)+'</span></div>'
+        + (s.obj ? '<div class="mi-sub">'+esc(s.obj)+'</div>' : '')
+        + (s.existing && s.prev ? '<div class="mi-sub" style="color:var(--ok)">★ '+esc(s.prev)+'</div>' : '')
+        + (ov ? '<div class="mi-sub" style="color:var(--gold-ink)">Klassen ändrad av PM från '+esc(s.s)+' till '+esc(ov)+'</div>' : '')
+        + (s.why ? '<div class="mi-why">'+esc(s.why)+'</div>' : '')
+        + (s.stmt ? '<div class="mi-quote">'+esc(s.stmt)+'</div>' : '')
+        + '<div class="mi-sub">Källa: '+esc(s.srcLabel || '—')+(s.url ? ' · '+(extLink(s.url) || esc(s.url)) : '')+(s.web && s.web !== s.url ? ' · egen webbplats '+(extLink(s.web) || esc(s.web)) : '')+(s.ch ? ' · kanal: '+esc(s.ch) : '')+'</div></li>'; }).join('') + '</ol>';
+  const own = SUP.filter(s => s.adv && s.adv.val > 0);
+  $('#miPrices').innerHTML = own.length ? '<ul class="mi-list">' + own.map(s => '<li><div class="mi-head"><b>'+esc(s.name)+'</b>'+sb(cls(s))+'<span class="mi-price">'+eur(s.adv.val)+' / rum / mån</span></div><div class="mi-sub">'+esc(s.price || s.adv.txt || '')+(s.priceSrc ? ' · '+esc(s.priceSrc) : '')+' · sett '+esc(R.fetched || '')+'</div></li>').join('') + '</ul>'
+    : '<p class="field-helper">Ingen leverantör i den här sökningen publicerade ett pris som gick att räkna om.</p>';
+  const all = miAllPrices(), city = String(r.city || '').trim().toLowerCase(), country = String(r.country || '').trim().toLowerCase();
+  const types = ['S1','S2','S3','S4','S5','S6','S7'].filter(t => all.some(o => o.s === t && o.country === country));
+  $('#miBench').innerHTML = types.length ? '<h4 class="mi-h4">Jämförelse per supplytyp · annonserade priser i teamets sökningar</h4><ul class="mi-list">' + types.map(t => {
+      const v = w => all.filter(o => o.s === t && w(o)).map(o => o.val);
+      return '<li><div class="mi-head">'+sb(t)+'<span class="muted small">'+esc(STYPE[t])+'</span></div>'
+        + '<div class="mi-sub">Den här sökningen: '+miSpan(v(o => o.req === CUR))+'</div>'
+        + '<div class="mi-sub">'+esc(r.city || 'Orten')+', alla sökningar: '+miSpan(v(o => o.city === city))+'</div>'
+        + '<div class="mi-sub">'+esc(r.country || 'Landet')+', alla sökningar: '+miSpan(v(o => o.country === country))+'</div></li>'; }).join('') + '</ul>'
+      + '<p class="mi-sub" style="margin-top:8px">'+all.length+' prisobservationer i teamets sökningar totalt.</p>'
+    : '';
+}
+
 /* ---------- logos + init ---------- */
 const LOGO = $('#logoMain').src;
 $('#logoPortal').src = LOGO; $('#logoFooter').src = LOGO;
@@ -3963,6 +4095,8 @@ const REMOTE = (() => {
   }
   const WHO_OF = { person:'pm', ai:'ai', system:'sys', leverantor:'sup' }, ACTOR_OF = { pm:'person', ai:'ai', sys:'system', sup:'leverantor' };
   const hm = d => String(d.getHours()).padStart(2, '0')+':'+String(d.getMinutes()).padStart(2, '0');
+  // 0.9.0: log time with the date when it is not today (a request often runs over several days)
+  const when = iso => { const d = new Date(iso); return d.toDateString() === new Date().toDateString() ? hm(d) : d.getDate()+' '+MSV[d.getMonth()]+' '+hm(d); };
   const STATUS = { pagar:'running', i_ko:'running', klar:'done', fel:'error', avbruten:'error' };
   function toRec(row){
     const latest = (row.latest || [])[0] || null, done = (row.done || [])[0] || null;
@@ -3970,10 +4104,11 @@ const REMOTE = (() => {
       fields:toFields(row), reqText:row.source_text || '', saved:!!row.saved, ui:row.ui || {},
       status:latest ? (STATUS[latest.status] || 'draft') : 'draft', error:latest && latest.error || '', runId:latest ? latest.id : null,
       result:done ? done.result : null, cost:done ? Number(done.cost_usd || 0) : 0,
-      log:(row.events || []).map(e => ({ t:hm(new Date(e.occurred_at)), who:WHO_OF[e.actor_type] || 'sys', txt:e.summary, by:e.actor_type === 'person' ? SOURCING_USER.name : null })) };
+      log:(row.events || []).map(e => ({ t:when(e.occurred_at), at:e.occurred_at, who:WHO_OF[e.actor_type] || 'sys', txt:e.summary,
+        by:e.actor_type === 'person' ? ((e.data && e.data.by) || SOURCING_USER.name) : null })) };
   }
   const SELECT = 'select=id,ref,created_at,source_text,saved,ui,country,city,area,start_date,end_date,persons,persons_per_room,twin,furnished,kitchen,wifi,dishwasher,laundry,parking_spaces,'
-    + 'request_private(*),latest:search_runs(id,status,error,cost_usd,created_at),done:search_runs(result,cost_usd,created_at,status),events(occurred_at,actor_type,summary)'
+    + 'request_private(*),latest:search_runs(id,status,error,cost_usd,created_at),done:search_runs(result,cost_usd,created_at,status),events(occurred_at,actor_type,summary,data)'
     + '&latest.order=created_at.desc&latest.limit=1&done.status=eq.klar&done.order=created_at.desc&done.limit=1&events.order=occurred_at.asc';
   const loadAll = async () => (await rest('GET', 'requests?' + SELECT + '&order=created_at.asc')).map(toRec);
   const loadOne = async id => toRec((await rest('GET', 'requests?' + SELECT + '&id=eq.' + id))[0]);
@@ -4027,9 +4162,10 @@ const REMOTE = (() => {
     } finally { DRIVING.delete(id); }
   }
   // Every line in the activity log of a saved request is kept in the database (events), in the signed-in person's name.
-  async function logLine(id, who, txt){
+  // 0.9.0: the name from "Min profil" is kept with the line (data.by), so it still shows after a reload
+  async function logLine(id, who, txt, by){
     if (!UUID.test(id || '')) return;
-    try { await rest('POST', 'events', { actor_type:ACTOR_OF[who] || 'system', actor_id:userId(), request_id:id, kind:'logg', summary:String(txt).slice(0, 2000), data:{ who } }, 'return=minimal'); }
+    try { await rest('POST', 'events', { actor_type:ACTOR_OF[who] || 'system', actor_id:userId(), request_id:id, kind:'logg', summary:String(txt).slice(0, 2000), data:{ who, by:by || null } }, 'return=minimal'); }
     catch (e) { console.warn('Loggraden sparades inte:', e.message); }
   }
   async function saveUi(id, ui){
@@ -4047,8 +4183,12 @@ function logTo(st, who, txt){
   if (st === S) renderLog();
 }
 // Lines written while a request is open are also saved (see REMOTE.logLine).
-{ const _log = log; log = function (who, txt, mins){ _log(who, txt, mins); if (CUR && DATASETS[CUR] && DATASETS[CUR].semi) REMOTE.logLine(CUR, who, txt); }; }
-{ const _logTo = logTo; logTo = function (st, who, txt){ _logTo(st, who, txt); const id = Object.keys(STATES).find(k => STATES[k] === st); if (id && DATASETS[id] && DATASETS[id].semi) REMOTE.logLine(id, who, txt); }; }
+// 0.9.0: the real time (the demo moved a pretend clock one minute per line) and the person's name are kept with every line.
+{ const _log = log; log = function (who, txt, mins){ _log(who, txt, mins);
+    const e = S.log[S.log.length - 1], d = new Date(); if (e) { e.t = String(d.getHours()).padStart(2, '0')+':'+String(d.getMinutes()).padStart(2, '0'); e.at = d.toISOString(); renderLog(); }
+    if (CUR && DATASETS[CUR] && DATASETS[CUR].semi) REMOTE.logLine(CUR, who, txt, who === 'pm' ? me().name : null); }; }
+{ const _logTo = logTo; logTo = function (st, who, txt){ _logTo(st, who, txt); const e = st.log[st.log.length - 1]; if (e) e.at = new Date().toISOString();
+    const id = Object.keys(STATES).find(k => STATES[k] === st); if (id && DATASETS[id] && DATASETS[id].semi) REMOTE.logLine(id, who, txt, who === 'pm' ? me().name : null); }; }
 // "Markera skickad" in the supplier list: creates the RFQ text if needed and ticks it (or takes the tick back)
 { const _contactCell = contactCell; contactCell = sp => _contactCell(sp) + sentToggle(sp); }
 function sentToggle(sp){
