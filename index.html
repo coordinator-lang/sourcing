@@ -1244,7 +1244,7 @@ footer { background:var(--purple); color:rgba(255,255,255,.6); padding:48px 48px
   </div>
   <div class="footer-bottom">
     <span>© Nordicta 2026</span>
-    <span>Nordicta Sourcing · app 0.8.1</span>
+    <span>Nordicta Sourcing · app 0.8.2</span>
   </div>
 </footer>
 
@@ -4292,7 +4292,7 @@ async function semiSourceConfirm(){
   openModal('<div class="modal-head"><div class="eyebrow">Riktig sökning på webben</div><h3>Sök boende i '+esc(r.city)+'</h3></div>'+
     '<div class="modal-body"><ul class="ck-list" style="margin-bottom:14px">'+
       '<li><span class="i-ok">'+IC.check+'</span><span>'+r.rooms+' '+roomWord(r)+' för '+r.persons+' personer · '+dSv(r.start)+' – '+dSv(r.end)+'</span></li>'+
-      '<li><span class="i-ok">'+IC.check+'</span><span>Ca 12 sökningar och 15 sidor · tar ca 5 minuter · låt sidan vara öppen tills den är klar (stängs den fortsätter sökningen nästa gång sidan öppnas)</span></li>'+
+      '<li><span class="i-ok">'+IC.check+'</span><span>Ca 12 sökningar och 20 sidor · tar ca 5 minuter · låt sidan vara öppen tills den är klar (stängs den fortsätter sökningen nästa gång sidan öppnas)</span></li>'+
       '<li><span class="i-ok">'+IC.check+'</span><span>Kostar ca $2–3 i API (tak $'+SEMI_INFO.costCap.toFixed(0)+') · '+left+' av '+SEMI_INFO.maxRunsPerDay+' sökningar kvar i dag · $'+SEMI_INFO.spentToday.toFixed(2)+' använt i dag</span></li>'+
       '<li><span class="i-lock">'+IC.lock+'</span><span>Till AI:n skickas ort, område, arbetsplats, datum, antal och krav. Aldrig kund, projekt, budget, kontaktperson eller anteckningar.</span></li>'+
     '</ul></div>'+
