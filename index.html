@@ -652,6 +652,87 @@ footer { background:var(--purple); color:rgba(255,255,255,.6); padding:48px 48px
   footer { padding:36px 20px 22px; }
   .mail-body { padding:20px 18px 24px; }
 }
+
+/* ===== mobile, app 0.7.0 ===== */
+@media (max-width:720px){
+  /* less above the work: compact header, no badge list */
+  .demo-banner { font-size:12px; padding:7px 14px; }
+  .hero { padding:18px 16px 16px; }
+  .hero h1 { font-size:26px; margin-bottom:6px; letter-spacing:-.5px; }
+  .hero p { font-size:14px; line-height:1.5; margin-bottom:0; }
+  .hero-badges { display:none !important; }
+  .req-bar { font-size:13px; padding:10px 14px; gap:4px 14px; margin-bottom:16px; }
+  .view-head { margin-bottom:14px; }
+
+  /* every table: cards instead of columns */
+  #reqTable thead, #resTable thead, #rfqTable thead { display:none; }
+  #reqTable, #resTable, #rfqTable, #reqTable tbody, #resTable tbody, #rfqTable tbody { display:block; width:100%; }
+  #reqTable tr > td, #resTable tr > td, #rfqTable tr > td { display:block; padding:0; border:0; white-space:normal !important; min-width:0; }
+  #reqTable tr, #resTable tr, #rfqTable tr { border-bottom:1px solid var(--line); }
+  #reqTable tr:last-child, #resTable tr:last-child, #rfqTable tr:last-child { border-bottom:0; }
+
+  /* the team's requests */
+  #reqTable tr.req-row { display:grid; grid-template-columns:minmax(0,1fr) auto; grid-template-areas:"name status" "period period" "need sent" "last last"; gap:4px 12px; padding:14px 16px; }
+  #reqTable tr.req-row > td:nth-child(1) { grid-area:name; }
+  #reqTable tr.req-row > td:nth-child(2) { grid-area:period; color:var(--muted); font-size:13px; }
+  #reqTable tr.req-row > td:nth-child(3) { grid-area:need; font-size:13px; }
+  #reqTable tr.req-row > td:nth-child(4) { grid-area:status; justify-self:end; }
+  #reqTable tr.req-row > td:nth-child(5) { grid-area:sent; justify-self:end; font-size:13px; }
+  #reqTable tr.req-row > td:nth-child(5)::before { content:'Skickat '; color:var(--muted); }
+  #reqTable tr.req-row > td:nth-child(6), #reqTable tr.req-row > td:nth-child(8) { display:none; }
+  #reqTable tr.req-row > td:nth-child(7) { grid-area:last; font-size:12px; }
+  #reqTable td.empty { padding:18px 16px; }
+
+  /* step 3: one card per supplier */
+  #resTable tbody tr:not(.why-row):not(.exc-toggle) { display:grid; grid-template-columns:34px 28px minmax(0,1fr) 44px;
+    grid-template-areas:"cb rank name x" ". type type type" ". contact contact contact" ". price price price" ". cap cap cap" ". room room room" ". src src src" ". flags flags flags";
+    gap:8px 6px; padding:14px 12px 16px; }
+  #resTable tbody tr > td:nth-child(1) { grid-area:cb; }
+  #resTable tbody tr > td:nth-child(2) { grid-area:rank; padding-top:2px; }
+  #resTable tbody tr > td:nth-child(3) { grid-area:name; }
+  #resTable tbody tr > td:nth-child(4) { grid-area:type; display:flex; align-items:center; flex-wrap:wrap; gap:4px 10px; }
+  #resTable tbody tr > td:nth-child(4) > div { margin:0 !important; }
+  #resTable tbody tr > td:nth-child(5) { grid-area:cap; font-size:13px; }
+  #resTable tbody tr > td:nth-child(6) { grid-area:room; font-size:13px; }
+  #resTable tbody tr > td:nth-child(7) { grid-area:price; font-size:13px; }
+  #resTable tbody tr > td:nth-child(8) { grid-area:contact; font-size:13.5px; overflow-wrap:anywhere; }
+  #resTable tbody tr > td:nth-child(9) { grid-area:src; font-size:12.5px; overflow-wrap:anywhere; }
+  #resTable tbody tr > td:nth-child(10) { grid-area:flags; }
+  #resTable tbody tr > td:nth-child(11) { grid-area:x; justify-self:end; }
+  #resTable td.c-cap::before { content:'Kapacitet: '; color:var(--muted); font-weight:600; }
+  #resTable td.c-room::before { content:'Rummen: '; color:var(--muted); font-weight:600; }
+  #resTable td.c-price::before { content:'Pris: '; color:var(--muted); font-weight:600; }
+  #resTable td.c-src > .tier { margin-right:6px; }
+  #resTable tbody tr.sel { background:#faf9fd; }
+  #resTable tbody tr.sel > td { background:transparent; }
+  #resTable tr.why-row > td, #resTable tr.exc-toggle > td { padding:12px; }
+
+  /* step 4: supplier, status, actions */
+  #rfqTable tbody tr { display:grid; grid-template-columns:34px minmax(0,1fr) auto; grid-template-areas:"rank name status" ". act act"; gap:4px 10px; padding:12px 14px; }
+  #rfqTable tbody tr > td:nth-child(1) { grid-area:rank; }
+  #rfqTable tbody tr > td:nth-child(2) { grid-area:name; overflow-wrap:anywhere; }
+  #rfqTable tbody tr > td:nth-child(3), #rfqTable tbody tr > td:nth-child(4), #rfqTable tbody tr > td:nth-child(5) { display:none; }
+  #rfqTable tbody tr > td:nth-child(6) { grid-area:status; text-align:right; }
+  #rfqTable tbody tr > td:nth-child(7) { grid-area:act; }
+  #rfqTable tbody tr.sel { background:var(--purple-soft); }
+  .rfq-actions { padding:14px 16px 18px; }
+  .rfq-actions .btn, .rfq-actions .btn-outline { flex:1 1 100%; justify-content:center; }
+  .mail-head { padding:12px 14px; }
+  .mail-tabs { gap:6px; }
+
+  /* tap targets for a finger */
+  .cb { padding:8px; margin:-8px; }
+  .cbx { width:24px; height:24px; }
+  .iconbtn { width:40px; height:40px; }
+  .sent-pill { padding:8px 14px; font-size:13px; }
+  .copy-mini { padding:7px 14px; font-size:12.5px; }
+  #resTable .linkbtn, #rfqTable .linkbtn, .hero-eyebrow .linkbtn { display:inline-block; padding:8px 4px; margin:-6px 0; }
+  #resTable a.ext, #rfqTable a.ext { display:inline-block; padding:8px 0; margin:-6px 0; border-bottom:0; text-decoration:underline; text-decoration-color:rgba(38,34,98,.3); text-underline-offset:3px; }
+  .sf-name { padding:11px 4px 11px 14px; }
+  .sf-star, .sf-x { padding:11px 12px 11px 8px; }
+  .hero-eyebrow { letter-spacing:.1em; }
+  .flag { font-size:11px; }
+}
 </style>
 </head>
 <body>
@@ -736,7 +817,7 @@ footer { background:var(--purple); color:rgba(255,255,255,.6); padding:48px 48px
     </div>
     <div class="section">
       <div class="tbl-wrap"><table class="t" id="reqTable"></table></div>
-      <p class="field-helper">Allt i teamet syns för alla, och "Mina" är förvalt. Dina sparade filter och ditt standardfilter gäller bara dig. I demon sparas de i webbläsaren, i verktyget i Supabase (tabellen saved_filters) så att de följer med mellan datorer. Oskarshamn och Prešov går att öppna i demon. De andra raderna visar hur olika statusar ser ut.</p>
+      <p class="field-helper">Alla i teamet loggar in med kontot Sourcing, så alla förfrågningar syns för alla. Sparade filter och standardfiltret gäller bara den här webbläsaren.</p>
     </div>
   </div>
 </main>
@@ -749,19 +830,19 @@ footer { background:var(--purple); color:rgba(255,255,255,.6); padding:48px 48px
       <ul class="ro-list" id="pfAccount"></ul>
     </div>
     <div class="section">
-      <div class="section-header"><div class="section-num">2</div><h2>Avsändare och signatur</h2></div>
+      <div class="section-header"><div class="section-num">2</div><h2>Ditt namn och språket i RFQ-texten</h2></div>
       <div class="grid grid-3">
-        <div class="field"><label for="pf_name">Namn i mejlen</label><input id="pf_name" type="text"/></div>
-        <div class="field"><label for="pf_title">Titel</label><input id="pf_title" type="text"/></div>
-        <div class="field"><label for="pf_phone">Telefon</label><input id="pf_phone" type="text" placeholder="+46 …"/></div>
-        <div class="field"><label for="pf_sender">Skicka från</label><select id="pf_sender"></select></div>
-        <div class="field"><label for="pf_lang">Språk i RFQ-mejl</label><select id="pf_lang"><option value="supplier">Leverantörens språk (svenska till svenska, tyska till tyska osv.)</option><option value="en">Alltid engelska</option></select></div>
-        <div class="field"><label>Svar går till</label><div class="sig-box" id="pfReply" style="padding:11px 14px"></div></div>
-        <div class="field full"><label>Så här ser signaturen ut i mejlen</label><div class="sig-box" id="pfSig"></div></div>
+        <div class="field"><label for="pf_name">Ditt namn</label><input id="pf_name" type="text"/></div>
+        <div class="field" hidden><label for="pf_title">Titel</label><input id="pf_title" type="text"/></div>
+        <div class="field" hidden><label for="pf_phone">Telefon</label><input id="pf_phone" type="text" placeholder="+46 …"/></div>
+        <div class="field" hidden><label for="pf_sender">Skicka från</label><select id="pf_sender"></select></div>
+        <div class="field"><label for="pf_lang">Språk i RFQ-texten</label><select id="pf_lang"><option value="supplier">Leverantörens språk (svenska till svenska, tyska till tyska osv.)</option><option value="en">Alltid engelska</option></select></div>
+        <div class="field" hidden><label>Svar går till</label><div class="sig-box" id="pfReply" style="padding:11px 14px"></div></div>
+        <div class="field full" hidden><label>Så här ser signaturen ut i mejlen</label><div class="sig-box" id="pfSig"></div></div>
       </div>
-      <p class="field-helper">Du kan bara skicka från din egen adress och från delade brevlådor som admin har gett dig rätt till. Microsoft 365 stoppar allt annat. Svar går alltid också till sourcing@nordicta.com, så att verktyget kan koppla dem till rätt förfrågan utan att läsa din inkorg.</p>
+      <p class="field-helper">Teamet delar kontot Sourcing, så skriv ditt eget namn här. Det syns i loggen, vid "Markera skickad" och på leverantörer du lägger till manuellt. RFQ-texten får ingen signatur – din vanliga Outlook-signatur används.</p>
     </div>
-    <div class="section">
+    <div class="section" hidden>
       <div class="section-header"><div class="section-num">3</div><h2>Notiser</h2></div>
       <div class="chips" id="pfNotify">
         <button type="button" class="chip" data-n="run">När en sökning är klar</button>
@@ -770,7 +851,7 @@ footer { background:var(--purple); color:rgba(255,255,255,.6); padding:48px 48px
       </div>
     </div>
     <div class="submit-section">
-      <p class="submit-note">Profilen gäller bara dig. I demon sparas den i webbläsaren, i verktyget i Supabase.</p>
+      <p class="submit-note">Sparas bara i den här webbläsaren.</p>
       <button class="btn" id="btnSaveProfile" type="button">Spara profil</button>
     </div>
   </div>
@@ -797,7 +878,7 @@ footer { background:var(--purple); color:rgba(255,255,255,.6); padding:48px 48px
         </div>
         <div class="row-actions">
           <button class="btn" id="btnParse" type="button"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M12 2l1.9 6.1L20 10l-6.1 1.9L12 18l-1.9-6.1L4 10l6.1-1.9z"/></svg><span>Tolka med AI</span></button>
-          <span class="muted small">I demon är tolkningen förinspelad. I skarpt läge gör Claude den på några sekunder.</span>
+          <span class="muted small">Claude tolkar texten på Nordictas server på några sekunder. Kontrollera fälten efteråt.</span>
         </div>
       </div>
       <div class="section">
@@ -840,7 +921,7 @@ footer { background:var(--purple); color:rgba(255,255,255,.6); padding:48px 48px
         <p class="field-helper">Alla värden går att skriva över manuellt. Nätter räknas från incheckning till utcheckning.</p>
       </div>
       <div class="submit-section">
-        <p class="submit-note">Förfrågan sparas som <b>NDT-PO-2026-00451</b>. Kund, projekt och budget stannar internt.</p>
+        <p class="submit-note">Allt sparas automatiskt. Kund, projekt och budget skickas aldrig till sökningen, och inget internt kommer med i RFQ-texten. Arbetsplatsen används bara för att välja var sökningen utgår från.</p>
         <button class="btn" id="btnSaveReq" type="button">Spara och gå till sourcing →</button>
       </div>
     </div>
@@ -851,7 +932,7 @@ footer { background:var(--purple); color:rgba(255,255,255,.6); padding:48px 48px
     <div class="view-head">
       <div class="eyebrow">Steg 2 av 4</div>
       <h2 class="view-title">AI-sourcing</h2>
-      <p class="view-lead">AI söker först i Nordictas egen databas och sedan på webben, på engelska och på lokalt språk. Körningen är ett bakgrundsjobb, så du kan stänga sidan medan den pågår.</p>
+      <p class="view-lead">AI söker på webben, på lokalt språk och på engelska, och jämför träffarna med HV-Databasen. Sökningen tar ca 5 minuter. Låt sidan vara öppen tills den är klar – stängs den fortsätter sökningen nästa gång någon i teamet öppnar verktyget.</p>
     </div>
     <div class="form-card">
       <div class="section">
@@ -883,7 +964,7 @@ footer { background:var(--purple); color:rgba(255,255,255,.6); padding:48px 48px
     <div class="view-head">
       <div class="eyebrow">Steg 3 av 4</div>
       <h2 class="view-title">Granska och välj leverantörer</h2>
-      <p class="view-lead">Du bestämmer vem som kontaktas. AI kontaktar aldrig någon utan ditt godkännande. Klicka på ”Varför?” för att se klassningen, källan och utdraget den bygger på.</p>
+      <p class="view-lead">Du bestämmer vem som får RFQ-texten. Verktyget kontaktar ingen själv. Klicka på ”Varför?” för att se klassningen, källan och utdraget den bygger på.</p>
     </div>
     <div class="toolbar">
       <div class="sum" id="resSum"></div>
@@ -936,7 +1017,7 @@ footer { background:var(--purple); color:rgba(255,255,255,.6); padding:48px 48px
       <div class="section">
         <div class="section-header"><div class="section-num">✓</div><h2>Leverantörer i den här förfrågan</h2></div>
         <div class="tbl-wrap"><table class="t" id="rfqTable"></table></div>
-        <p class="field-helper">Bockarna sparas i den här webbläsaren. När verktyget kopplas till databasen syns de för alla i teamet.</p>
+        <p class="field-helper">Bockarna sparas i förfrågan och syns för alla i teamet.</p>
       </div>
     </div>
     <div class="next-row">
@@ -1161,7 +1242,7 @@ footer { background:var(--purple); color:rgba(255,255,255,.6); padding:48px 48px
   </div>
   <div class="footer-bottom">
     <span>© Nordicta 2026</span>
-    <span>Nordicta Sourcing · app 0.6.2</span>
+    <span>Nordicta Sourcing · app 0.7.0</span>
   </div>
 </footer>
 
@@ -1668,10 +1749,11 @@ $('#orderChips').innerHTML = ORDER.map((o, i) => {
   const lab = isS ? '<span class="sb '+SCLS[code]+'">'+code+'</span> '+STYPE[code] : code;
   return (i ? '<span class="arrow">→</span>' : '') + '<span class="chip static">'+lab+(o[1] ? ' <span class="muted" style="font-weight:400">· '+o[1]+'</span>' : '')+'</span>';
 }).join('');
+function monthsText(m){ const n = Math.round(+m || 0); return n >= 2 ? n+' månader' : n === 1 ? '1 månad' : 'under en månad'; }
 function renderStep2(){
   const r = req();
-  $('#memTitle').textContent = 'Det här vet Nordicta redan om '+r.city;
-  $('#stratIntro').textContent = 'Följer sourcingordningen i Supply Classification. Ordningen är inte absolut: '+Math.round(r.months)+' månader och '+r.rooms+' rum '+(r.months >= 6 ? 'gör S1 möjligt om kunden garanterar perioden.' : 'är normalt för kort för att en S1-investering ska löna sig.');
+  $('#memTitle').textContent = 'Sökningen i '+r.city;
+  $('#stratIntro').textContent = 'Följer sourcingordningen i Supply Classification. Ordningen är inte absolut: '+monthsText(r.months)+' och '+r.rooms+' rum '+(r.months >= 6 ? 'gör S1 möjligt om kunden garanterar perioden.' : 'är normalt för kort för att en S1-investering ska löna sig.');
   $('#qEn').innerHTML = Q_EN.map(q => '<span class="q">'+esc(q.replace('{c}', r.city))+'</span>').join('');
   $('#qSk').innerHTML = Q_SK.map(q => '<span class="q">'+esc(q.replace('{c}', r.city))+'</span>').join('');
 }
@@ -3582,7 +3664,7 @@ function renderList(){
   REQS.forEach(q => { if (!USERS.some(u => u.id === q.owner)) q.owner = SOURCING_USER.id; });
   renderFilters();
   const qq = F.q.trim().toLowerCase();
-  let rows = REQS.filter(q => (F.owner === 'all' || (F.owner === 'mine' ? q.owner === USER.id : q.owner === F.owner)) &&
+  let rows = REQS.filter(q => !emptyDraft(q) && (F.owner === 'all' || (F.owner === 'mine' ? q.owner === USER.id : q.owner === F.owner)) &&
     (!F.statuses.length || F.statuses.includes(statusOf(q))) &&
     (!qq || (q.city+' '+q.country+' '+q.customer).toLowerCase().includes(qq)));
   rows.sort((a, b) => F.sort === 'city' ? a.city.localeCompare(b.city, 'sv') : F.sort === 'start' ? a.start.localeCompare(b.start) : actOf(b) - actOf(a));
@@ -3631,7 +3713,7 @@ $('#btnNewReq').addEventListener('click', () => semiNewRequest());
 /* ---------- profile ---------- */
 function renderProfile(){
   const u = USER, p = profileOf(u), m = me();
-  $('#pfAccount').innerHTML = [['Namn', u.name], ['E-post', u.email], ['Roll', u.roleLabel+' (sätts av admin)'], ['Inloggning', 'Microsoft 365 · Entra ID']].map(x => '<li><span class="k">'+esc(x[0])+'</span><span>'+esc(x[1])+'</span></li>').join('');
+  $('#pfAccount').innerHTML = [['Konto', u.name+' · '+u.roleLabel], ['E-post', u.email], ['Inloggning', 'E-post och lösenord']].map(x => '<li><span class="k">'+esc(x[0])+'</span><span>'+esc(x[1])+'</span></li>').join('');
   $('#pf_name').value = p.name; $('#pf_title').value = p.title; $('#pf_phone').value = p.phone || '';
   $('#pf_sender').innerHTML = '<option value="own">'+esc(u.email)+' (din adress)</option>'+(u.sendAs ? '<option value="shared">sourcing@nordicta.com (delad brevlåda)</option>' : '<option value="shared" disabled>sourcing@nordicta.com – kräver behörighet från admin</option>');
   $('#pf_sender').value = p.sender === 'shared' && u.sendAs ? 'shared' : 'own';
@@ -3677,7 +3759,7 @@ function showView(v){
   if (v === 'list' || v === 'profile') $('#banner').textContent = 'Inloggad med teamkontot Sourcing. Sökningen körs på Nordictas server (ca $2 per sökning, högst 10 per dag). Inget mejl skickas från verktyget.' + (SEMI_OK ? '' : ' Kunde inte nå servern just nu – ladda om sidan.');
   if (v === 'app') $('#banner').textContent = DS.banner;
   if (v === 'list') { $('#heroEyebrow').textContent = 'sourcing.nordicta.com'; $('#heroTitle').textContent = 'Förfrågningar'; $('#heroText').textContent = 'Allt i teamet syns för alla. "Mina" är förvalt, och du kan spara egna filter och välja vilket som ska vara ditt standardfilter.'; renderList(); }
-  if (v === 'profile') { $('#heroEyebrow').textContent = 'Inloggad som '+USER.email; $('#heroTitle').textContent = 'Min profil'; $('#heroText').textContent = 'Avsändare, signatur och notiser. RFQ-mejlen skickas från ditt eget Microsoft 365-konto.'; renderProfile(); }
+  if (v === 'profile') { $('#heroEyebrow').textContent = 'Inloggad som '+USER.email; $('#heroTitle').textContent = 'Min profil'; $('#heroText').textContent = 'Ditt namn i loggen och språket i RFQ-texten. Inget mejl skickas från verktyget.'; renderProfile(); }
   if (v === 'app') renderHeroForApp();
   window.scrollTo(0, 0);
 }
@@ -3694,7 +3776,7 @@ function leaveRequest(){
 }
 function openRequest(id){
   const q = reqById(id);
-  if (!q || !q.ds) { toast('Exempelrad. I demon går Oskarshamn och Prešov att öppna.'); return; }
+  if (!q || !q.ds) { toast('Förfrågan kunde inte öppnas. Ladda om sidan och försök igen.'); return; }
   leaveRequest();
   CUR = id; DS = DATASETS[q.ds];
   REQ_TEXT = DS.REQ_TEXT; PARSED = DS.PARSED; Q_EN = DS.Q_EN; Q_SK = DS.Q_SK; SUP = DS.SUP; SHORT = DS.SHORT; REF = DS.REF;
@@ -4034,6 +4116,10 @@ function deleteManual(id){
   REMOTE.saveUi(CUR, ds.rec.ui);
   log('pm','Tog bort manuellt tillagd leverantör: '+s.name);
   renderResults(); toast(supNo(s)+' '+s.name+' är borttagen');
+}
+function emptyDraft(q){
+  const ds = DATASETS[q.id], r = ds && ds.rec;
+  return !!(r && q.kind === 'semi' && q.id !== CUR && !r.saved && !String(r.reqText || '').trim() && !(r.fields && r.fields.f_city));
 }
 let AUTOSAVE_T = null, CHOICES_T = null;
 function scheduleAutosave(){
