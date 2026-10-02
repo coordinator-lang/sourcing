@@ -804,6 +804,9 @@ footer { background:var(--purple-fill); color:rgba(255,255,255,.6); padding:48px
   #resTable tbody tr.grp-row { display:block; }
   #resTable tr.grp-row > td { display:block; padding:14px 12px; }
 }
+/* ===== app 0.9.5 ===== */
+.reply-pill.on { background:var(--gold-soft); border-color:var(--gold); color:var(--gold-ink); }
+#replyKind { flex-wrap:wrap; }
 </style>
 </head>
 <body>
@@ -1352,7 +1355,7 @@ footer { background:var(--purple-fill); color:rgba(255,255,255,.6); padding:48px
   </div>
   <div class="footer-bottom">
     <span>© Nordicta 2026</span>
-    <span>Nordicta Sourcing · app 0.9.4</span>
+    <span>Nordicta Sourcing · app 0.9.5</span>
   </div>
 </footer>
 
@@ -1732,7 +1735,7 @@ $('#stepper').addEventListener('click', e => { const b = e.target.closest('[data
 function reqStatus(){
   if (!S.saved) return 'Utkast';
   if (!S.sourced) return 'Sourcing';
-  return Object.values(S.rfq).some(q => q.sentMark) ? 'Väntar på svar' : 'Research klar';
+  return replyStatus(CUR, 'Research klar');
 }
 function coverage(){
   const r = req(), valid = S.offers.filter(o => o.status === 'offer' && !S.exOffers.has(o.sid));
@@ -2536,7 +2539,7 @@ function renderRfq(){
     '<div class="rfq-actions">'+
       '<button type="button" class="btn" data-copy="body">'+IC_COPY+'<span>Kopiera mejltext</span></button>'+
       (q.sentMark ? '<span class="sent-done">'+IC.check+'Skickad '+esc(q.sentMark.at)+'</span><button type="button" class="linkbtn" data-mark="0">Ångra</button>'
-                  : '<button type="button" class="btn-outline" data-mark="1">'+IC.check+'Markera som skickad</button>')+calledAction(sp)+
+                  : '<button type="button" class="btn-outline" data-mark="1">'+IC.check+'Markera som skickad</button>')+calledAction(sp)+replyAction(sp)+
     '</div>';
   const r = req();
   $('#ckIn').innerHTML = supplierFacing().map(x => '<li><span class="i-ok">'+IC.check+'</span><span>'+esc(x[0])+': <span class="val">'+esc(x[1])+'</span></span></li>').join('');
@@ -2548,7 +2551,7 @@ function renderRfq(){
     const s2 = byId(id), q2 = S.rfq[id];
     h += '<tr'+(id === S.rfqView ? ' class="sel"' : '')+'><td class="rank">'+supNo(s2)+'</td><td><div class="sname">'+esc(s2.name)+'</div><div class="ssub">'+esc(s2.email || s2.manual || '')+'</div></td><td>'+sb(cls(s2))+'</td><td>'+q2.ref+'</td>'+
       '<td class="small">'+esc(RFQ_I18N[rfqLang(s2)].name)+'</td>'+
-      '<td>'+(q2.sentMark ? '<span class="status-dot ok">Skickad</span><div class="ssub">'+esc(q2.sentMark.at)+'</div>' : '<span class="status-dot open">Att skicka</span>')+(calledOf(id) ? '<div class="ssub">Ringd '+esc(calledOf(id).at)+'</div>' : '')+'</td>'+
+      '<td>'+(q2.sentMark ? '<span class="status-dot ok">Skickad</span><div class="ssub">'+esc(q2.sentMark.at)+'</div>' : '<span class="status-dot open">Att skicka</span>')+(calledOf(id) ? '<div class="ssub">Ringd '+esc(calledOf(id).at)+'</div>' : '')+(replyOf(id) ? '<div class="ssub" style="color:var(--ok);font-weight:600">'+esc(REPLY_SHORT[replyOf(id).kind])+'</div>' : '')+'</td>'+
       '<td style="white-space:nowrap"><button type="button" class="linkbtn" data-show="'+id+'">Visa text</button>'+(q2.sentMark ? '' : ' · <button type="button" class="linkbtn" data-unrfq="'+id+'">Ta bort</button>')+'</td></tr>';
   });
   $('#rfqTable').innerHTML = h + '</tbody>';
@@ -3841,6 +3844,59 @@ function isMarket(s){
   return MARKET_SITES.some(m => host.includes(m));
 }
 
+/* ---------- app 0.9.5: replies ---------- */
+// requests.ui.reply = { supplierId: { at, by, kind:'offert'|'nej'|'annat', note } }
+const REPLY_KIND = { offert:'Offert / intresserad', nej:'Nej tack', annat:'Annat svar' };
+const REPLY_SHORT = { offert:'Svar: offert', nej:'Svar: nej tack', annat:'Svar mottaget' };
+function uiOf(id){ const ds = DATASETS[id]; return (ds && ds.rec && ds.rec.ui) || {}; }
+function replyOf(id){ return (uiOf(CUR).reply || {})[id] || null; }
+function replyStatus(id, fallback){
+  const ui = uiOf(id), rfq = ui.rfq || {}, reply = ui.reply || {};
+  const contacted = new Set(Object.keys(rfq).filter(k => rfq[k] && rfq[k].sentMark).concat(Object.keys(ui.called || {}), Object.keys(reply)));
+  const replied = Object.keys(reply).length;
+  if (!replied) return contacted.size ? 'Väntar på svar' : fallback;
+  return [...contacted].every(k => reply[k]) ? 'Svar mottagna' : 'Delvis svar';
+}
+function setReply(id, val){
+  const sp = byId(id); if (!sp || !DS || !DS.rec || !CUR) return;
+  const m = Object.assign({}, uiOf(CUR).reply || {});
+  if (val) { m[id] = { at:new Date().toLocaleString('sv-SE', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' }), by:me().name, kind:val.kind, note:val.note || '' };
+    log('pm', 'Markerade svar från ' + sp.name + ': ' + REPLY_KIND[val.kind] + (val.note ? ' – ' + val.note : '')); }
+  else { delete m[id]; log('pm', 'Tog bort svaret från ' + sp.name); }
+  DS.rec.ui = Object.assign({}, DS.rec.ui, { reply:m });
+  if (DS.semi) REMOTE.saveUi(CUR, DS.rec.ui);
+  renderReqBar(); if (S.step === 3) renderResults(); else if (S.step === 4) renderRfq(); else if (S.step === 5) renderMI5();
+}
+function openReply(id){
+  const sp = byId(id); if (!sp) return;
+  const r = replyOf(id), kind = (r && r.kind) || 'offert';
+  openModal('<div class="modal-head"><div class="eyebrow">Svar</div><h3>'+esc(sp.name)+'</h3></div>'+
+    '<div class="modal-body"><div class="field"><label>Vad svarade de?</label><div class="seg" id="replyKind">'+
+      Object.keys(REPLY_KIND).map(k => '<button type="button" class="seg-btn'+(k === kind ? ' active' : '')+'" data-kind="'+k+'">'+REPLY_KIND[k]+'</button>').join('')+'</div></div>'+
+    '<div class="field" style="margin-top:14px"><label for="replyNote">Anteckning (valfritt)</label><textarea id="replyNote" rows="3" placeholder="T.ex. 8 900 kr per rum och månad, 5 rum lediga från 1 april">'+esc((r && r.note) || '')+'</textarea></div></div>'+
+    '<div class="modal-foot">'+(r ? '<button type="button" class="btn-ghost" id="btnReplyDel">Ta bort svaret</button>' : '')+'<button type="button" class="btn-ghost" data-close>Avbryt</button><button type="button" class="btn" id="btnReplySave">Spara svar</button></div>');
+  $('#modal [data-close]').addEventListener('click', closeModal);
+  $('#replyKind').addEventListener('click', e => { const b = e.target.closest('[data-kind]'); if (b) $$('#replyKind .seg-btn').forEach(x => x.classList.toggle('active', x === b)); });
+  $('#btnReplySave').addEventListener('click', () => { const b = $('#replyKind .seg-btn.active'); setReply(id, { kind:b ? b.dataset.kind : 'offert', note:$('#replyNote').value.trim() }); closeModal(); });
+  if (r) $('#btnReplyDel').addEventListener('click', () => { setReply(id, null); closeModal(); });
+}
+function contactedOrAnswered(id){ const q = S.rfq[id]; return !!((q && q.sentMark) || calledOf(id) || replyOf(id)); }
+function replyPill(sp){
+  if (!contactedOrAnswered(sp.id)) return '';
+  const r = replyOf(sp.id);
+  return '<button type="button" class="sent-pill reply-pill'+(r ? ' on' : '')+'" data-reply="'+sp.id+'" title="'+(r ? esc(REPLY_KIND[r.kind]+' · '+r.at+(r.by ? ' av '+r.by : '')+(r.note ? ' · '+r.note : ''))+' · klicka för att ändra' : 'Markera att leverantören har svarat')+'">'+(r ? IC.check+REPLY_SHORT[r.kind] : 'Markera svar')+'</button>';
+}
+function replyAction(sp){
+  if (!contactedOrAnswered(sp.id)) return '';
+  const r = replyOf(sp.id);
+  return r ? '<span class="sent-done">'+IC.check+esc(REPLY_SHORT[r.kind])+' '+esc(r.at)+'</span><button type="button" class="linkbtn" data-reply="'+sp.id+'">Ändra</button>'
+           : '<button type="button" class="btn-outline" data-reply="'+sp.id+'">Markera svar</button>';
+}
+{ const _sentToggle = sentToggle; sentToggle = sp => { const h = _sentToggle(sp), rp = replyPill(sp); return h && rp && h.endsWith('</div>') ? h.slice(0, -6) + rp + '</div>' : h; }; }
+{ const _miStatus = miStatus; miStatus = s => { const r = replyOf(s.id); return _miStatus(s) + (r ? ' <span class="status-dot ok">'+esc(REPLY_SHORT[r.kind])+'</span>' : ''); }; }
+$('#resTable').addEventListener('click', e => { const b = e.target.closest('[data-reply]'); if (b) openReply(+b.dataset.reply); });
+$('#mailView').addEventListener('click', e => { const b = e.target.closest('[data-reply]'); if (b) openReply(+b.dataset.reply); });
+
 /* ---------- logos + init ---------- */
 const LOGO = $('#logoMain').src;
 $('#logoPortal').src = LOGO; $('#logoFooter').src = LOGO;
@@ -3888,8 +3944,8 @@ const REQS = [
   { id:'ex-lulea', city:'Luleå', country:'Sverige', customer:'Exempelkund C', period:'1 nov 2026 – 30 apr 2027', need:'12 pers · 6 twinrum', owner:'johan', kind:'example', status:'Förhandling', cov:[6,6], start:'2026-11-01', act:-440, last:'i går 16:40' },
   { id:'ex-tampere', city:'Tammerfors', country:'Finland', customer:'Exempelkund D', period:'1 dec 2026 – 28 feb 2027', need:'6 pers · 3 twinrum', owner:'johan', kind:'example', status:'Offerter mottagna', cov:[3,3], start:'2026-12-01', act:-2000, last:'2 dagar sedan' }
 ];
-const STATUSES = ['Utkast','Sourcing pågår','Research klar','Väntar på svar','Delvis svar','Offerter mottagna','Förhandling'];
-const STATUS_CLS = { 'Utkast':'st-n', 'Sourcing pågår':'st-g', 'Research klar':'', 'Väntar på svar':'st-g', 'Delvis svar':'st-g', 'Offerter mottagna':'st-ok', 'Förhandling':'' };
+const STATUSES = ['Utkast','Sourcing pågår','Research klar','Väntar på svar','Delvis svar','Svar mottagna'];
+const STATUS_CLS = { 'Utkast':'st-n', 'Sourcing pågår':'st-g', 'Research klar':'', 'Väntar på svar':'st-g', 'Delvis svar':'st-g', 'Svar mottagna':'st-ok' };
 const FIELD_IDS = Object.keys(OS_PARSED);
 function seedState(q, ds){
   if (ds.semi) return seedSemi(q, ds);
@@ -3911,7 +3967,7 @@ function reqStatusOf(st, id){
   if (!st || !st.saved) return 'Utkast';
   if (st.sourcing) return 'Sourcing pågår';
   if (!st.sourced) return 'Utkast';
-  return sentCount(id)[0] ? 'Väntar på svar' : 'Research klar';
+  return replyStatus(id, 'Research klar');
 }
 function statusOf(q){ return q.ds ? reqStatusOf(STATES[q.id] || (q.id === 'oskarshamn' ? (STATES[q.id] = seedState(q, DATASETS[q.ds])) : null), q.id) : q.status; }
 function covOf(q){
@@ -3919,7 +3975,14 @@ function covOf(q){
   return sentCount(q.id);
 }
 function actOf(q){ if (!q.ds) return q.act; const st = STATES[q.id]; return st && st.log.length ? st.clock : -99999; }
-function lastOf(q){ if (!q.ds) return q.last; const st = STATES[q.id]; return st && st.log.length ? 'i dag '+st.log[st.log.length - 1].t : '—'; }
+function lastOf(q){
+  if (!q.ds) return q.last;
+  const st = STATES[q.id], e = st && st.log.length ? st.log[st.log.length - 1] : null;
+  if (!e) return '—';
+  if (!e.at) return e.t;
+  const d = new Date(e.at), hm = String(d.getHours()).padStart(2, '0')+':'+String(d.getMinutes()).padStart(2, '0');
+  return d.toDateString() === new Date().toDateString() ? 'i dag '+hm : d.getDate()+' '+MSV[d.getMonth()]+' '+hm;
+}
 
 /* ---------- filters (team-visible, "Mina" default, saved per person) ---------- */
 const BUILTIN = [
@@ -4080,7 +4143,7 @@ function openRequest(id){
   $('#reqText').placeholder = DS.semi ? 'Klistra in kundens mejl eller skriv fritt, t.ex. "12 montörer i Luleå 1 nov–30 apr, enkelrum, parkering, budget 450 kr per person och natt"' : '';
   const bs = $('#btnSource'); bs.disabled = false;
   if (DS.semi && S.sourcing) { renderSemiRun(S); bs.disabled = true; bs.querySelector('span').textContent = 'Söker…'; }
-  else if (S.sourced) { renderRun(RUN_N, false); bs.querySelector('span').textContent = 'Visa resultat →'; }
+  else if (S.sourced) { renderRun(runSteps().length, false); bs.querySelector('span').textContent = 'Visa resultat →'; }
   else { renderRun(0, false); $('#runLog').innerHTML = '<li class="empty" style="display:block;text-align:left">Inte startad än.</li>'; bs.querySelector('span').textContent = 'Starta sourcing'; }
   renderCalc(); renderLog(); lockRequest();
   showView('app');
@@ -4632,7 +4695,7 @@ function semiEvent(id, ev){
     applyResult(id, ev.record);
     st.sourcing = false; st.sourced = true;
     if (wasRunning && ev.summary) logTo(st, 'ai', ev.summary);
-    if (CUR === id) { renderRun(RUN_N, false); const bs = $('#btnSource'); bs.disabled = false; bs.querySelector('span').textContent = 'Visa resultat →'; renderStepper(); renderReqBar(); }
+    if (CUR === id) { renderRun(runSteps().length, false); const bs = $('#btnSource'); bs.disabled = false; bs.querySelector('span').textContent = 'Visa resultat →'; renderStepper(); renderReqBar(); }
     if (wasRunning) toast('Sökningen i '+(ev.record.fields.f_city || '')+' är klar: '+ev.short);
   } else if (ev.type === 'error') {
     const wasRunning = st.sourcing; st.sourcing = false;
