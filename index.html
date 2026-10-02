@@ -1355,7 +1355,7 @@ footer { background:var(--purple-fill); color:rgba(255,255,255,.6); padding:48px
   </div>
   <div class="footer-bottom">
     <span>© Nordicta 2026</span>
-    <span>Nordicta Sourcing · app 0.9.7</span>
+    <span>Nordicta Sourcing · app 0.9.8</span>
   </div>
 </footer>
 
@@ -3975,6 +3975,7 @@ function covOf(q){
   return sentCount(q.id);
 }
 function actOf(q){ if (!q.ds) return q.act; const st = STATES[q.id]; return st && st.log.length ? st.clock : -99999; }
+function draftSub(rec){ const d = new Date(rec.created); return (rec.ref || 'Ej ifylld') + (isNaN(d) ? '' : ' · skapad ' + d.getDate() + ' ' + MSV[d.getMonth()]); }
 function lastOf(q){
   if (!q.ds) return q.last;
   const st = STATES[q.id], e = st && st.log.length ? st.log[st.log.length - 1] : null;
@@ -4013,19 +4014,19 @@ function renderList(){
   REQS.forEach(q => { if (!USERS.some(u => u.id === q.owner)) q.owner = SOURCING_USER.id; });
   renderFilters();
   const qq = F.q.trim().toLowerCase();
-  let rows = REQS.filter(q => !emptyDraft(q) && (F.owner === 'all' || (F.owner === 'mine' ? q.owner === USER.id : q.owner === F.owner)) &&
+  let rows = REQS.filter(q => (F.owner === 'all' || (F.owner === 'mine' ? q.owner === USER.id : q.owner === F.owner)) &&
     (!F.statuses.length || F.statuses.includes(statusOf(q))) &&
     (!qq || (q.city+' '+q.country+' '+q.customer).toLowerCase().includes(qq)));
   rows.sort((a, b) => F.sort === 'city' ? a.city.localeCompare(b.city, 'sv') : F.sort === 'start' ? a.start.localeCompare(b.start) : actOf(b) - actOf(a));
-  const real = REQS.filter(q => !emptyDraft(q)), emptyN = REQS.length - real.length, mineN = real.filter(q => q.owner === USER.id).length;
-  $('#filterSum').textContent = 'Visar '+rows.length+' av '+real.length+' förfrågningar i teamet · '+mineN+' är dina'+(emptyN === 1 ? ' · 1 tomt utkast dolt' : emptyN ? ' · '+emptyN+' tomma utkast dolda' : '');
+  const mineN = REQS.filter(q => q.owner === USER.id).length;
+  $('#filterSum').textContent = 'Visar '+rows.length+' av '+REQS.length+' förfrågningar i teamet · '+mineN+' är dina';
   let h = '<thead><tr><th>Förfrågan</th><th>Period</th><th>Behov</th><th>Status</th><th>Skickat</th><th>Ägare</th><th>Senast</th><th></th></tr></thead><tbody>';
   if (!rows.length) h += '<tr><td colspan="8" class="empty">Inga förfrågningar matchar filtret.</td></tr>';
   rows.forEach(q => {
     const st = statusOf(q), c = covOf(q), pct = c[1] ? Math.round(c[0] / c[1] * 100) : 0, o = userById(q.owner), mine = q.owner === USER.id;
     const tag = q.kind === 'semi' ? '<span class="flag ok">Live-sökning</span>' : q.kind === 'live' ? '<span class="flag ok">Live-data</span>' : q.kind === 'demo' ? '<span class="flag i">Fiktiv demo</span>' : '<span class="flag w">Exempel</span>';
     h += '<tr class="req-row'+(q.ds ? '' : ' ex')+'" data-req="'+q.id+'">'+
-      '<td class="c-name"><div class="sname">'+esc(q.city || 'Ny förfrågan')+(q.country ? ', '+esc(q.country) : '')+'</div><div class="ssub">'+esc(q.customer)+'</div><div style="margin-top:5px">'+tag+'</div></td>'+
+      '<td class="c-name"><div class="sname">'+esc(q.city || 'Ny förfrågan')+(q.country ? ', '+esc(q.country) : '')+'</div><div class="ssub">'+esc(q.city || !DATASETS[q.id] || !DATASETS[q.id].rec ? q.customer : draftSub(DATASETS[q.id].rec))+'</div><div style="margin-top:5px">'+tag+'</div></td>'+
       '<td style="white-space:nowrap">'+esc(q.period)+'</td><td style="white-space:nowrap">'+esc(q.need)+'</td>'+
       '<td><span class="pill '+(STATUS_CLS[st] || '')+'">'+esc(st)+'</span></td>'+
       '<td><span class="mini-cov">'+c[0]+'/'+c[1]+'<span class="bar"><b style="width:'+pct+'%"></b></span></span></td>'+
@@ -4502,10 +4503,6 @@ function deleteManual(id){
   REMOTE.saveUi(CUR, ds.rec.ui);
   log('pm','Tog bort manuellt tillagd leverantör: '+s.name);
   renderResults(); toast(supNo(s)+' '+s.name+' är borttagen');
-}
-function emptyDraft(q){
-  const ds = DATASETS[q.id], r = ds && ds.rec;
-  return !!(r && q.kind === 'semi' && q.id !== CUR && !r.saved && !String(r.reqText || '').trim() && !(r.fields && r.fields.f_city));
 }
 let AUTOSAVE_T = null, CHOICES_T = null;
 function scheduleAutosave(){
