@@ -1355,7 +1355,7 @@ footer { background:var(--purple-fill); color:rgba(255,255,255,.6); padding:48px
   </div>
   <div class="footer-bottom">
     <span>© Nordicta 2026</span>
-    <span>Nordicta Sourcing · app 0.9.5</span>
+    <span>Nordicta Sourcing · app 0.9.6</span>
   </div>
 </footer>
 
@@ -4544,7 +4544,7 @@ function semiDataset(rec){
   const q = SEMI_INFO;
   return { mode:'live', semi:true, rec, REQ_TEXT:rec.reqText || '', PARSED:{}, REF:rec.ref,
     fillLabel:'Simulera från publicerat pris', reqLabel:'Kundens förfrågan – klistra in mejlet eller skriv fritt', title, text,
-    banner:'Tolkningen och sökningen körs på Nordictas server. En sökning kostar ca $2–3 (tak $4). Inget mejl skickas från verktyget.',
+    banner:'Tolkningen och sökningen körs på Nordictas server. En sökning kostar ca $2–3 (tak $5). Inget mejl skickas från verktyget.',
     Q_EN: R ? R.qLocal : [], Q_SK: R ? R.qEn : [], SUP: R ? R.sup.concat((rec.ui && rec.ui.manualSup) || []) : [], SHORT: R ? Object.assign({}, R.short, Object.fromEntries(((rec.ui && rec.ui.manualSup) || []).map(x => [x.id, String(x.name).slice(0, 24)]))) : {},
     runSteps: () => R ? R.steps : [], defaultSel: R ? R.sup.filter(x => x.rec).map(x => x.id) : [], portalPref: R ? R.portalPref : null,
     fetched: R ? R.fetched : '', runDate: R ? R.runDate : new Date().toISOString().slice(0, 10),
@@ -4554,7 +4554,7 @@ function semiDataset(rec){
         + SEMI_TILE('Sidor lästa', R.stats.pages, R.stats.unique + ' unika träffar · ' + (R.stats.blocked.length ? R.stats.blocked.length + ' blockerade' : 'inga blockerade'))
         + SEMI_TILE('Körtid och kostnad', Math.floor(R.stats.durationS / 60) + ' min ' + (R.stats.durationS % 60) + ' s', 'API-kostnad $' + R.stats.cost.toFixed(2))
       : SEMI_TILE('Status', 'Ej sökt', 'starta sourcingen nedan') + SEMI_TILE('Tid', 'ca 5 min', 'körs i bakgrunden på servern')
-        + SEMI_TILE('Kostnad', 'ca $2–3', 'tak $4 per sökning') + SEMI_TILE('Dagens sökningar', q ? q.runsToday + '/' + q.maxRunsPerDay : '–', 'gräns per dag'),
+        + SEMI_TILE('Kostnad', 'ca $2–3', 'tak $5 per sökning') + SEMI_TILE('Dagens sökningar', q ? q.runsToday + '/' + q.maxRunsPerDay : '–', 'gräns per dag'),
     srcNote: SRC_NOTE_BASE + (R ? 'Riktiga källor, hämtade ' + R.fetched + '.' + (R.stats.blocked.length ? ' Blockerade läsningen: ' + R.stats.blocked.join(', ') + '.' : '') + (R.notes ? ' ' + R.notes : '') : ''),
     resSum: n => R ? '<b>' + R.stats.unique + '</b> träffar · <b>' + R.stats.suppliers + '</b> leverantörer + ' + R.stats.channels + ' kanaler · <b>' + n + '</b> med e-post' + (R.stats.hvKnown ? ' · <b>' + R.stats.hvKnown + '</b> finns i HV-Databasen (överst)' : '') + ' · sökt ' + R.fetched : '' };
 }
@@ -4642,7 +4642,7 @@ async function semiSourceConfirm(){
   openModal('<div class="modal-head"><div class="eyebrow">Riktig sökning på webben</div><h3>Sök boende i '+esc(r.city)+'</h3></div>'+
     '<div class="modal-body"><ul class="ck-list" style="margin-bottom:14px">'+
       '<li><span class="i-ok">'+IC.check+'</span><span>'+r.rooms+' '+roomWord(r)+' för '+r.persons+' personer · '+dSv(r.start)+' – '+dSv(r.end)+'</span></li>'+
-      '<li><span class="i-ok">'+IC.check+'</span><span>Ca 12 sökningar och 20 sidor · tar ca 5 minuter · låt sidan vara öppen tills den är klar (stängs den fortsätter sökningen nästa gång sidan öppnas)</span></li>'+
+      '<li><span class="i-ok">'+IC.check+'</span><span>Ca 15 sökningar och 20 sidor · tar ca 5 minuter · låt sidan vara öppen tills den är klar (stängs den fortsätter sökningen nästa gång sidan öppnas)</span></li>'+
       '<li><span class="i-ok">'+IC.check+'</span><span>Kostar ca $2–3 i API (tak $'+SEMI_INFO.costCap.toFixed(0)+') · '+left+' av '+SEMI_INFO.maxRunsPerDay+' sökningar kvar i dag · $'+SEMI_INFO.spentToday.toFixed(2)+' använt i dag</span></li>'+
       '<li><span class="i-lock">'+IC.lock+'</span><span>Till AI:n skickas ort, område, arbetsplats, datum, antal och krav. Aldrig kund, projekt, budget, kontaktperson eller anteckningar.</span></li>'+
     '</ul></div>'+
