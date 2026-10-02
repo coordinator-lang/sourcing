@@ -810,6 +810,11 @@ footer { background:var(--purple-fill); color:rgba(255,255,255,.6); padding:48px
 /* ===== app 0.9.9 ===== */
 .hv-ok { color:var(--ok) !important; }
 .hv-ok .linkbtn, .ssub.ok .linkbtn { color:inherit; }
+/* ===== the request list: "Öppna" glows faintly green ===== */
+#reqTable [data-open] { transition:box-shadow .2s ease, border-color .2s ease, color .2s ease; }
+#reqTable [data-open]:hover, #reqTable [data-open]:focus-visible { border-color:var(--ok); color:var(--ok); box-shadow:0 0 0 1px rgba(27,122,58,.25), 0 0 14px 2px rgba(27,122,58,.28); outline:none; }
+:root[data-theme="dark"] #reqTable [data-open]:hover, :root[data-theme="dark"] #reqTable [data-open]:focus-visible { box-shadow:0 0 0 1px rgba(77,191,115,.35), 0 0 16px 3px rgba(77,191,115,.38); }
+@media (prefers-reduced-motion: reduce) { #reqTable [data-open] { transition:none; } }
 </style>
 </head>
 <body>
@@ -1358,7 +1363,7 @@ footer { background:var(--purple-fill); color:rgba(255,255,255,.6); padding:48px
   </div>
   <div class="footer-bottom">
     <span>© Nordicta 2026</span>
-    <span>Nordicta Sourcing · app 0.9.9</span>
+    <span>Nordicta Sourcing · app 0.9.10</span>
   </div>
 </footer>
 
