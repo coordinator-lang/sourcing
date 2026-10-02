@@ -807,6 +807,9 @@ footer { background:var(--purple-fill); color:rgba(255,255,255,.6); padding:48px
 /* ===== app 0.9.5 ===== */
 .reply-pill.on { background:var(--gold-soft); border-color:var(--gold); color:var(--gold-ink); }
 #replyKind { flex-wrap:wrap; }
+/* ===== app 0.9.9 ===== */
+.hv-ok { color:var(--ok) !important; }
+.hv-ok .linkbtn, .ssub.ok .linkbtn { color:inherit; }
 </style>
 </head>
 <body>
@@ -1355,7 +1358,7 @@ footer { background:var(--purple-fill); color:rgba(255,255,255,.6); padding:48px
   </div>
   <div class="footer-bottom">
     <span>© Nordicta 2026</span>
-    <span>Nordicta Sourcing · app 0.9.8</span>
+    <span>Nordicta Sourcing · app 0.9.9</span>
   </div>
 </footer>
 
@@ -1955,7 +1958,7 @@ function renderResults(){
       (S.rfq[s.id] && S.rfq[s.id].sentMark ? '<td><span class="sent-tick" title="RFQ skickad '+esc(S.rfq[s.id].sentMark.at)+'" aria-label="RFQ skickad">'+IC.check+'</span></td>'
         : '<td><label class="cb'+(dis?' disabled':'')+'" title="'+(!contactable(s)?(s.noReason || 'Kan inte kontaktas utanför plattformen'):done?'RFQ-text skapad. Ta bort krysset för att ta bort leverantören från RFQ-listan.':'')+'"><input type="checkbox" data-sel="'+s.id+'"'+((sel || S.rfq[s.id]) && !exc ? ' checked' : '')+(dis?' disabled':'')+'><span class="cbx"></span></label></td>')+
       '<td class="rank">'+supNo(s)+'</td>'+
-      '<td class="c-name"><div class="sname">'+esc(s.name)+'</div><div class="ssub">'+esc(s.obj)+'</div>'+(s.existing?'<div class="ssub ok">★ '+esc(s.prev)+'</div>':'')+(s.known?'<div class="ssub" style="color:var(--gold-ink)">↺ '+esc(s.known)+'</div>':'')+'<button type="button" class="linkbtn" data-why="'+s.id+'">'+(S.openWhy.has(s.id)?'Dölj':'Varför?')+'</button></td>'+
+      '<td class="c-name"><div class="sname">'+esc(s.name)+'</div><div class="ssub">'+esc(s.obj)+'</div>'+(s.existing ? hvLine(s, 'ssub ok') : '')+(s.known?'<div class="ssub" style="color:var(--gold-ink)">↺ '+esc(s.known)+'</div>':'')+'<button type="button" class="linkbtn" data-why="'+s.id+'">'+(S.openWhy.has(s.id)?'Dölj':'Varför?')+'</button></td>'+
       '<td class="c-type">'+sb(c)+'<div class="ssub">'+esc(STYPE[c])+'</div>'+(S.classOverride[s.id]?'<div class="ssub" style="color:var(--gold-ink)">ändrad av PM</div>':'')+'<div style="margin-top:7px">'+confBar(s.conf)+'</div></td>'+
       '<td class="c-cap">'+esc(s.cap)+'<div class="ssub">'+esc(s.furn)+'</div></td>'+
       '<td class="c-room">'+esc(s.twin)+'</td>'+
@@ -3773,7 +3776,7 @@ function renderMI5(){
   $('#miWhy').innerHTML = '<ol class="mi-list">' + SUP.map(s => { const c = cls(s), ov = S.classOverride[s.id];
       return '<li><div class="mi-head"><span class="rank">'+supNo(s)+'</span><b>'+esc(s.name)+'</b>'+sb(c)+'<span class="muted small">'+esc(STYPE[c] || '')+(s.conf != null ? ' · säkerhet '+s.conf+' %' : '')+'</span><span class="mi-st">'+miStatus(s)+'</span></div>'
         + (s.obj ? '<div class="mi-sub">'+esc(s.obj)+'</div>' : '')
-        + (s.existing && s.prev ? '<div class="mi-sub" style="color:var(--ok)">★ '+esc(s.prev)+'</div>' : '')
+        + (s.existing ? hvLine(s, 'mi-sub hv-ok') : '')
         + (ov ? '<div class="mi-sub" style="color:var(--gold-ink)">Klassen ändrad av PM från '+esc(s.s)+' till '+esc(ov)+'</div>' : '')
         + (s.why ? '<div class="mi-why">'+esc(s.why)+'</div>' : '')
         + (s.stmt ? '<div class="mi-quote">'+esc(s.stmt)+'</div>' : '')
@@ -3896,6 +3899,61 @@ function replyAction(sp){
 { const _miStatus = miStatus; miStatus = s => { const r = replyOf(s.id); return _miStatus(s) + (r ? ' <span class="status-dot ok">'+esc(REPLY_SHORT[r.kind])+'</span>' : ''); }; }
 $('#resTable').addEventListener('click', e => { const b = e.target.closest('[data-reply]'); if (b) openReply(+b.dataset.reply); });
 $('#mailView').addEventListener('click', e => { const b = e.target.closest('[data-reply]'); if (b) openReply(+b.dataset.reply); });
+
+/* ---------- app 0.9.9: a known landlord's objects in the search area ---------- */
+const MONDAY_ITEM = 'https://nordicta.monday.com/boards/1453497707/pulses/';
+function hvLine(s, cls){
+  const pref = (s.hv && s.hv.quality === 'Föredragen HV') || /Föredragen HV/.test(s.prev || '');
+  return '<div class="'+cls+'">★ Finns i HV-Databasen'+(pref ? ' · Föredragen HV' : '')+' · <button type="button" class="linkbtn" data-hvobj="'+s.id+'">Visa objekt i området</button></div>';
+}
+function hvKeys(s){
+  if (s.hv && Array.isArray(s.hv.ids) && s.hv.ids.length) return { ids:s.hv.ids };
+  const ph = String(s.phone || '').replace(/[^0-9]/g, '').slice(-9), host = miHost(s.web || s.url);
+  return { email:s.email ? String(s.email).trim().toLowerCase() : '', phoneKey:ph.length >= 7 ? ph : '', domain:host && !MARKET_SITES.some(m => host.includes(m)) ? host : '' };
+}
+function hvArea(){
+  const R = DS && DS.rec && DS.rec.result, a = (R && R.area) || {};
+  const towns = (a.towns || (R && R.towns) || []).concat([req().city]).filter(Boolean).map(t => String(t).trim().toLowerCase());
+  return { lat:a.lat != null ? +a.lat : null, lng:a.lng != null ? +a.lng : null, km:a.km || 50, towns };
+}
+function kmBetween(a, b){
+  const rad = x => x * Math.PI / 180, dLat = rad(b.lat - a.lat), dLng = rad(b.lng - a.lng);
+  const h = Math.sin(dLat / 2) ** 2 + Math.cos(rad(a.lat)) * Math.cos(rad(b.lat)) * Math.sin(dLng / 2) ** 2;
+  return 2 * 6371 * Math.asin(Math.sqrt(h));
+}
+function hvObjInArea(o, A){
+  if (A.lat != null && o.lat != null && o.lng != null) return kmBetween(A, o) <= A.km;
+  return (o.cities || []).some(c => A.towns.includes(String(c).trim().toLowerCase()));
+}
+function linkUrl(u){ u = String(u || '').trim(); const l = u.toLowerCase(); return l.startsWith('https://') || l.startsWith('http://') ? u : 'https://' + u; }
+async function openHvObjects(id){
+  const s = byId(id); if (!s) return;
+  openModal('<div class="modal-head"><div class="eyebrow">HV-Databasen</div><h3>'+esc(s.name)+'</h3></div>'+
+    '<div class="modal-body" id="hvObjBody"><p class="muted">Hämtar objekten …</p></div>'+
+    '<div class="modal-foot"><button type="button" class="btn" data-close>Stäng</button></div>');
+  $('#modal [data-close]').addEventListener('click', closeModal);
+  let rows;
+  try { rows = await REMOTE.hvObjects(hvKeys(s)); }
+  catch (e) { const b = $('#hvObjBody'); if (b) b.innerHTML = '<p class="login-err">Kunde inte läsa HV-Databasen: '+esc(e.message)+'</p>'; return; }
+  const body = $('#hvObjBody'); if (!body) return;
+  const A = hvArea();
+  const inA = rows.filter(o => hvObjInArea(o, A)).map(o => Object.assign({}, o, { d:A.lat != null && o.lat != null && o.lng != null ? kmBetween(A, o) : null }))
+    .sort((a, b) => ((a.d == null) - (b.d == null)) || ((a.d || 0) - (b.d || 0)));
+  const other = rows.length - inA.length;
+  if (!rows.length) { body.innerHTML = '<p>Hyresvärden finns i HV-Databasen, men inga objekt hittades i kopian just nu.</p>'; return; }
+  body.innerHTML = (inA.length
+      ? '<p class="mi-sub" style="margin:0 0 6px">'+inA.length+' objekt i sökområdet ('+(A.lat != null ? 'inom '+A.km+' km från sökningens mittpunkt' : 'orterna i sökningen')+').</p><ul class="mi-list">'+
+        inA.map(o => '<li><div class="mi-head"><b>'+esc(o.objekt_nr || 'Objekt utan nummer')+'</b>'+(o.d != null ? '<span class="muted small">'+fmt(o.d, 1)+' km</span>' : '')+
+          (o.group_title === 'Inaktiva' ? '<span class="flag w">Inaktiv</span>' : '')+(o.quality === 'Problematisk' ? '<span class="flag e">Problematisk</span>' : '')+
+          '<span class="mi-st"><a class="ext" href="'+MONDAY_ITEM+encodeURIComponent(o.monday_id)+'" target="_blank" rel="noopener noreferrer">Öppna i Monday ↗</a></span></div>'+
+          '<div class="mi-sub">'+esc([o.address, (o.cities || []).join(', ')].filter(Boolean).join(' · ') || 'Adress saknas')+'</div>'+
+          '<div class="mi-sub">'+esc([o.housing_type, o.furnished, o.bedrooms ? o.bedrooms+' sovrum' : '', o.beds ? o.beds+' bäddar' : '', o.rent ? Math.round(o.rent).toLocaleString('sv-SE')+' '+(o.currency || '')+'/mån' : ''].filter(Boolean).join(' · '))+
+          (o.link ? (o.housing_type || o.bedrooms || o.rent ? ' · ' : '')+'<a class="ext" href="'+esc(linkUrl(o.link))+'" target="_blank" rel="noopener noreferrer">Objektets länk ↗</a>' : '')+'</div></li>').join('')+'</ul>'
+      : '<p>Inga av hyresvärdens objekt ligger i sökområdet.</p>')+
+    (other ? '<p class="mi-sub" style="margin-top:10px">'+other+' objekt på andra orter visas inte.</p>' : '');
+}
+$('#resTable').addEventListener('click', e => { const b = e.target.closest('[data-hvobj]'); if (b) openHvObjects(+b.dataset.hvobj); });
+$('#miWhy').addEventListener('click', e => { const b = e.target.closest('[data-hvobj]'); if (b) openHvObjects(+b.dataset.hvobj); });
 
 /* ---------- logos + init ---------- */
 const LOGO = $('#logoMain').src;
@@ -4382,7 +4440,18 @@ const REMOTE = (() => {
     catch (e) { toast('Bocken kunde inte sparas: ' + e.message); }
   }
   const hvLookup = ors => rest('GET', 'hv_landlords?select=objekt_nr,klass,quality,email,phone&or=(' + ors.map(encodeURIComponent).join(',') + ')&limit=1');
-  return { handle, drive, logLine, saveUi, UUID, hvLookup };
+  // 0.9.9: all rows (objects) of a known landlord – by the ids the search matched, otherwise by e-mail/phone/own domain
+  const hvObjects = k => {
+    const ors = [];
+    if (k.ids && k.ids.length) ors.push('monday_id.in.(' + k.ids.map(Number).filter(Boolean).join(',') + ')');
+    if (k.email) ors.push('email.eq.' + k.email);
+    if (k.phoneKey) ors.push('phone_key.eq.' + k.phoneKey);
+    if (k.domain) ors.push('domain.eq.' + k.domain);
+    if (!ors.length) return Promise.resolve([]);
+    return rest('GET', 'hv_landlords?select=monday_id,objekt_nr,name,company,address,cities,lat,lng,link,housing_type,furnished,bedrooms,beds,rent,currency,quality,group_title&or=('
+      + ors.map(encodeURIComponent).join(',') + ')&order=objekt_nr.asc&limit=300');
+  };
+  return { handle, drive, logLine, saveUi, UUID, hvLookup, hvObjects };
 })();
 async function api(path, opts){ const o = opts || {}; return REMOTE.handle(o.method || 'GET', path, o.body); }
 function logTo(st, who, txt){
