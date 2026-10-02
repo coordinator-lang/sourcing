@@ -1355,7 +1355,7 @@ footer { background:var(--purple-fill); color:rgba(255,255,255,.6); padding:48px
   </div>
   <div class="footer-bottom">
     <span>© Nordicta 2026</span>
-    <span>Nordicta Sourcing · app 0.9.6</span>
+    <span>Nordicta Sourcing · app 0.9.7</span>
   </div>
 </footer>
 
@@ -4017,8 +4017,8 @@ function renderList(){
     (!F.statuses.length || F.statuses.includes(statusOf(q))) &&
     (!qq || (q.city+' '+q.country+' '+q.customer).toLowerCase().includes(qq)));
   rows.sort((a, b) => F.sort === 'city' ? a.city.localeCompare(b.city, 'sv') : F.sort === 'start' ? a.start.localeCompare(b.start) : actOf(b) - actOf(a));
-  const mineN = REQS.filter(q => q.owner === USER.id).length;
-  $('#filterSum').textContent = 'Visar '+rows.length+' av '+REQS.length+' förfrågningar i teamet · '+mineN+' är dina';
+  const real = REQS.filter(q => !emptyDraft(q)), emptyN = REQS.length - real.length, mineN = real.filter(q => q.owner === USER.id).length;
+  $('#filterSum').textContent = 'Visar '+rows.length+' av '+real.length+' förfrågningar i teamet · '+mineN+' är dina'+(emptyN === 1 ? ' · 1 tomt utkast dolt' : emptyN ? ' · '+emptyN+' tomma utkast dolda' : '');
   let h = '<thead><tr><th>Förfrågan</th><th>Period</th><th>Behov</th><th>Status</th><th>Skickat</th><th>Ägare</th><th>Senast</th><th></th></tr></thead><tbody>';
   if (!rows.length) h += '<tr><td colspan="8" class="empty">Inga förfrågningar matchar filtret.</td></tr>';
   rows.forEach(q => {
