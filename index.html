@@ -1352,7 +1352,7 @@ footer { background:var(--purple-fill); color:rgba(255,255,255,.6); padding:48px
   </div>
   <div class="footer-bottom">
     <span>© Nordicta 2026</span>
-    <span>Nordicta Sourcing · app 0.9.3</span>
+    <span>Nordicta Sourcing · app 0.9.4</span>
   </div>
 </footer>
 
@@ -4123,7 +4123,7 @@ function login(u){
 }
 function logout(){
   const a = store.get('auth', null);
-  if (a && a.access_token) sbAuth('logout', {}, a.access_token).catch(() => {});
+  if (a && a.access_token) sbAuth('logout?scope=local', {}, a.access_token).catch(() => {});
   store.set('auth', null);
   leaveRequest(); USER = null; store.set('session', null); showView('login');
 }
@@ -4177,10 +4177,25 @@ const REMOTE = (() => {
     if (!res.ok) throw new Error((j && (j.message || j.error)) || ('HTTP '+res.status));
     return j;
   }
-  async function fn(action, body){
+  // 0.9.4: a new token right away (not only when the old one is about to expire)
+  async function refreshNow(){
+    const a = store.get('auth', null);
+    if (!a || !a.refresh_token) return false;
+    const r = await sbAuth('token?grant_type=refresh_token', { refresh_token:a.refresh_token });
+    if (!r.ok || !r.j.access_token) { store.set('auth', null); return false; }
+    keepSession(r.j); return true;
+  }
+  async function fn(action, body, again){
     const t = await token();
     const res = await fetch(FN, { method:'POST', headers:{ apikey:SB_KEY, Authorization:'Bearer '+t, 'Content-Type':'application/json' }, body:JSON.stringify(Object.assign({ action }, body || {})) });
     let j = {}; try { j = await res.json(); } catch (e) {}
+    // 0.9.4: 401 = this browser's session was closed on the server (before 0.9.4 "Logga ut" closed every session of the
+    // shared account). Try a new token once; if that fails too, go to the sign-in page instead of showing an empty list.
+    if (res.status === 401 && !again) {
+      if (await refreshNow()) return fn(action, body, true);
+      toast('Inloggningen har gått ut. Logga in igen.'); logout();
+      const e = new Error('Du är utloggad'); e.auth = true; throw e;
+    }
     if (!res.ok) throw new Error(j.error || ('HTTP '+res.status));
     return j;
   }
@@ -4628,8 +4643,7 @@ function semiEvent(id, ev){
   if (VIEW === 'list') renderList();
 }
 async function semiInit(){
-  try { SEMI_INFO = await api('/api/health'); SEMI_OK = !!SEMI_INFO.ok; } catch (e) { SEMI_OK = false; }
-  if (!SEMI_OK) { if (VIEW === 'list') showView('list'); return; }
+  try { SEMI_INFO = await api('/api/health'); SEMI_OK = !!SEMI_INFO.ok; } catch (e) { SEMI_OK = false; if (e.auth || !USER) return; }
   try {
     const recs = await api('/api/requests');
     recs.slice().sort((a, b) => a.created.localeCompare(b.created)).forEach(rec => {
